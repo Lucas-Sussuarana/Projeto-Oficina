@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ordens de Serviço</title>
+</head>
+<body>
+
+<h1>Ordens de Serviço</h1>
+
+{% if ordens %}
+
+    {% for ordem in ordens %}
+
+        <div>
+            <strong>
+                <a href="{% url 'detalhe_ordem_servico' ordem.numero %}">
+                    OS nº {{ ordem.numero }}
+                </a>
+            </strong>
+            <br>
+
+            Cliente:
+            {{ ordem.cliente.nome }}
+
+            <br>
+
+            Veículo:
+            {{ ordem.veiculo.modelo }} -
+            {{ ordem.veiculo.placa }}
+
+            <br>
+
+            Status:
+            {{ ordem.get_status_display }}
+
+            <br>
+
+            Solicitação:
+            {{ ordem.solicitacao_cliente }}
+
+            <br><br>
+        </div>
+
+        <hr>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>Não há Ordens de Serviço disponíveis.</p>
+
+{% endif %}
+
+</body>
+</html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ordem de Serviço</title>
+</head>
+<body>
+
+{% if ordem.status == 'ABERTA' %}
+
+<form method="post" action="{% url 'iniciar_atendimento' ordem.numero %}">
+    {% csrf_token %}
+
+    <button type="submit">
+        Iniciar atendimento
+    </button>
+</form>
+
+{% endif %}
+
+<h1>Ordem de Serviço nº {{ ordem.numero }}</h1>
+
+<h2>Cliente</h2>
+
+<p>
+    Nome: {{ ordem.cliente.nome }}
+</p>
+
+<p>
+    CPF/CNPJ: {{ ordem.cliente.cpf_cnpj }}
+</p>
+
+<p>
+    Telefone: {{ ordem.cliente.telefone }}
+</p>
+
+<p>
+    Celular: {{ ordem.cliente.celular }}
+</p>
+
+<h2>Veículo</h2>
+
+<p>
+    Tipo: {{ ordem.veiculo.tipo }}
+</p>
+
+<p>
+    Marca: {{ ordem.veiculo.marca }}
+</p>
+
+<p>
+    Modelo: {{ ordem.veiculo.modelo }}
+</p>
+
+<p>
+    Ano: {{ ordem.veiculo.ano }}
+</p>
+
+<p>
+    Cor: {{ ordem.veiculo.cor }}
+</p>
+
+<p>
+    Placa: {{ ordem.veiculo.placa }}
+</p>
+
+<p>
+    Combustível: {{ ordem.veiculo.combustivel }}
+</p>
+
+<h2>Solicitação do cliente</h2>
+
+<p>
+    {{ ordem.solicitacao_cliente }}
+</p>
+
+<h2>Status</h2>
+
+<h2>Serviços realizados</h2>
+
+{% if ordem.itens_servico.all %}
+
+    {% for item in ordem.itens_servico.all %}
+
+        <p>
+            Serviço: {{ item.servico.nome }}
+            <br>
+            Quantidade: {{ item.quantidade }}
+            <br>
+            Preço unitário: R$ {{ item.preco_unitario }}
+            <br>
+            Subtotal: R$ {{ item.subtotal }}
+        </p>
+
+        <hr>
+
+    {% empty %}
+
+        <p>Nenhum serviço adicionado.</p>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>Nenhum serviço adicionado.</p>
+
+{% endif %}
+
+<h2>Peças utilizadas</h2>
+
+{% for item in ordem.itens_peca.all %}
+
+    <p>
+        Peça: {{ item.peca.nome }}
+        <br>
+        Quantidade: {{ item.quantidade }}
+        <br>
+        Preço unitário: R$ {{ item.preco_unitario }}
+        <br>
+        Subtotal: R$ {{ item.subtotal }}
+    </p>
+
+    <hr>
+
+{% empty %}
+
+    <p>Nenhuma peça adicionada.</p>
+
+{% endfor %}
+
+{% if ordem.status == 'EM_ATENDIMENTO' %}
+
+<h2>Adicionar peça</h2>
+
+<form method="post" action="{% url 'adicionar_peca' ordem.numero %}">
+    {% csrf_token %}
+
+    <label for="peca">
+        Peça:
+    </label>
+
+    <select name="peca" id="peca" required>
+        <option value="">
+            ---------
+        </option>
+
+        {% for peca in pecas %}
+            <option value="{{ peca.id }}">
+                {{ peca.nome }} - R$ {{ peca.preco }}
+                (Estoque: {{ peca.estoque }})
+            </option>
+        {% endfor %}
+    </select>
+
+    <br><br>
+
+    <label for="quantidade_peca">
+        Quantidade:
+    </label>
+
+    <input
+        type="number"
+        name="quantidade"
+        id="quantidade_peca"
+        value="1"
+        min="0.01"
+        step="0.01"
+        required
+    >
+
+    <br><br>
+
+    <button type="submit">
+        Adicionar peça
+    </button>
+</form>
+
+{% endif %}
+
+{% if ordem.status == 'EM_ATENDIMENTO' %}
+
+<h2>Nova observação</h2>
+
+<form method="post" action="{% url 'adicionar_observacao' ordem.numero %}">
+    {% csrf_token %}
+
+    <textarea
+        name="texto"
+        rows="5"
+        cols="60"
+        required
+    ></textarea>
+
+    <br><br>
+
+    <button type="submit">
+        Registrar observação
+    </button>
+</form>
+
+{% endif %}
+
+<h2>Observações</h2>
+
+{% for observacao in ordem.observacoes.all %}
+
+    <p>
+        <strong>{{ observacao.autor.username }}</strong>
+        -
+        {{ observacao.data }}
+    </p>
+
+    <p>
+        {{ observacao.texto }}
+    </p>
+
+    <hr>
+
+{% empty %}
+
+    <p>Nenhuma observação registrada.</p>
+
+{% endfor %}
+
+<p>
+    <strong>
+        Valor total da OS: R$ {{ ordem.valor_total }}
+    </strong>
+</p>
+
+<p>
+    {{ ordem.get_status_display }}
+</p>
+    {% if ordem.status == 'EM_ATENDIMENTO' %}
+
+    <h2>Adicionar serviço</h2>
+
+    <form method="post" action="{% url 'adicionar_servico' ordem.numero %}">
+        {% csrf_token %}
+
+        <label for="servico">
+            Serviço:
+        </label>
+
+        <select name="servico" id="servico" required>
+            <option value="">
+                ---------
+            </option>
+
+            {% for servico in servicos %}
+                <option value="{{ servico.id }}">
+                    {{ servico.nome }} - R$ {{ servico.preco }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <br><br>
+
+        <label for="quantidade">
+            Quantidade:
+        </label>
+
+        <input
+            type="number"
+            name="quantidade"
+            id="quantidade"
+            value="1"
+            min="0.01"
+            step="0.01"
+            required
+        >
+
+        <br><br>
+
+        <button type="submit">
+            Adicionar serviço
+        </button>
+    </form>
+
+    {% endif %}
+
+{% if ordem.status == 'EM_ATENDIMENTO' %}
+
+<h2>Finalizar atendimento</h2>
+
+<form method="post" action="{% url 'finalizar_ordem_servico' ordem.numero %}">
+    {% csrf_token %}
+
+    <label for="demanda_atendida">
+        A solicitação do cliente foi atendida?
+    </label>
+
+    <select
+        name="demanda_atendida"
+        id="demanda_atendida"
+        required
+    >
+        <option value="">
+            ---------
+        </option>
+
+        <option value="SIM">
+            Sim
+        </option>
+
+        <option value="NAO">
+            Não
+        </option>
+    </select>
+
+    <br><br>
+
+    <label for="motivo_nao_atendida">
+        Motivo caso não tenha sido atendida:
+    </label>
+
+    <br>
+
+    <textarea
+        name="motivo_nao_atendida"
+        id="motivo_nao_atendida"
+        rows="4"
+        cols="60"
+    ></textarea>
+
+    <br><br>
+
+    <label for="observacao_final">
+        Observação final:
+    </label>
+
+    <br>
+
+    <textarea
+        name="observacao_final"
+        id="observacao_final"
+        rows="4"
+        cols="60"
+    ></textarea>
+
+    <br><br>
+
+    <button type="submit">
+        Marcar como pronto
+    </button>
+
+</form>
+
+{% endif %}
+
+{% if ordem.status == 'PRONTO' %}
+
+<h2>Entrega da OS</h2>
+
+<form method="post" action="{% url 'entregar_ordem_servico' ordem.numero %}">
+    {% csrf_token %}
+
+    <button type="submit">
+        Marcar como entregue
+    </button>
+</form>
+
+{% endif %}
+
+</body>
+</html>

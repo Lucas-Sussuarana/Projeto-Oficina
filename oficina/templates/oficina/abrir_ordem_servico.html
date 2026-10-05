@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Abrir Ordem de Serviço</title>
+</head>
+<body>
+
+<h1>Abrir Ordem de Serviço</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+    {{ form.cliente.label_tag }}
+    {{ form.cliente }}
+
+    <br><br>
+
+    {{ form.veiculo.label_tag }}
+    {{ form.veiculo }}
+
+    <br><br>
+
+    {{ form.solicitacao_cliente.label_tag }}
+    {{ form.solicitacao_cliente }}
+
+    <br><br>
+
+    <button type="submit">
+        Abrir OS
+    </button>
+</form>
+
+<script>
+    const cliente = document.getElementById("id_cliente");
+    const veiculo = document.getElementById("id_veiculo");
+
+    cliente.addEventListener("change", function () {
+
+        const clienteId = this.value;
+
+        veiculo.innerHTML = '<option value="">---------</option>';
+
+        if (!clienteId) {
+            return;
+        }
+
+        fetch(
+            "{% url 'veiculos_por_cliente' %}?cliente_id=" + clienteId
+        )
+        .then(response => response.text())
+        .then(html => {
+            veiculo.innerHTML += html;
+        });
+    });
+</script>
+
+</body>
+</html>
