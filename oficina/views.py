@@ -185,6 +185,47 @@ def criar_servico(request):
         'servicos/form.html'
     )
 
+@user_passes_test(
+    lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
+)
+def lista_servicos(request):
+
+    servicos = Servico.objects.all().order_by('nome')
+
+    return render(
+        request,
+        'servicos/lista.html',
+        {'servicos': servicos}
+    )
+
+@user_passes_test(
+    lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
+)
+def editar_servico(request, id):
+
+    servico = get_object_or_404(Servico, id=id)
+
+    if request.method == 'POST':
+        nome = request.POST.get('nome')
+        descricao = request.POST.get('descricao')
+        preco = request.POST.get('preco')
+        ativo = request.POST.get('ativo')
+
+        if nome and preco:
+            servico.nome = nome
+            servico.descricao = descricao
+            servico.preco = preco
+            servico.ativo = ativo == 'on'
+            servico.save()
+
+            return redirect('lista_servicos')
+
+    return render(
+        request,
+        'servicos/form.html',
+        {'servico': servico}
+    )
+
 # ========================
 # ORDENS DE SERVIÇO
 # ========================

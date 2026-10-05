@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Serviços</title>
+</head>
+<body>
+
+<h1>Serviços cadastrados</h1>
+
+<a href="{% url 'criar_servico' %}">
+    Novo serviço
+</a>
+
+<br><br>
+
+{% for servico in servicos %}
+
+    <div>
+        <strong>{{ servico.nome }}</strong>
+        <br>
+        <a href="{% url 'editar_servico' servico.id %}">
+            Editar
+        </a>
+        Descrição: {{ servico.descricao }}
+        <br>
+        Preço: R$ {{ servico.preco }}
+        <br>
+        Status:
+        {% if servico.ativo %}
+            Ativo
+        {% else %}
+            Inativo
+        {% endif %}
+    </div>
+
+    <hr>
+
+{% empty %}
+
+    <p>Nenhum serviço cadastrado.</p>
+
+{% endfor %}
+
+</body>
+</html>

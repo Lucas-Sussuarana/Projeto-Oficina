@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>
+        {% if servico %}
+            Editar Serviço
+        {% else %}
+            Cadastro de Serviço
+        {% endif %}
+    </title>
+</head>
+<body>
+
+{% if servico %}
+    <h1>Editar Serviço</h1>
+{% else %}
+    <h1>Novo Serviço</h1>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+
+    <p>
+        <label for="nome">Nome:</label><br>
+        <input
+            type="text"
+            name="nome"
+            id="nome"
+            value="{{ servico.nome|default:'' }}"
+            required
+        >
+    </p>
+
+    <p>
+        <label for="descricao">Descrição:</label><br>
+        <textarea
+            name="descricao"
+            id="descricao"
+            rows="4"
+        >{{ servico.descricao|default:'' }}</textarea>
+    </p>
+
+    <p>
+        <label for="preco">Preço:</label><br>
+        <input
+            type="number"
+            name="preco"
+            id="preco"
+            min="0"
+            step="0.01"
+            value="{{ servico.preco|default:'' }}"
+            required
+        >
+    </p>
+
+    {% if servico %}
+        <p>
+            <label>
+                <input
+                    type="checkbox"
+                    name="ativo"
+                    {% if servico.ativo %}checked{% endif %}
+                >
+                Serviço ativo
+            </label>
+        </p>
+    {% endif %}
+
+    <button type="submit">
+        {% if servico %}
+            Salvar alterações
+        {% else %}
+            Salvar serviço
+        {% endif %}
+    </button>
+</form>
+
+<br>
+
+<a href="{% url 'lista_servicos' %}">
+    Voltar para serviços
+</a>
+
+</body>
+</html>
