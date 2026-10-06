@@ -15,7 +15,7 @@
             Iniciar atendimento
         </button>
     </form>
-    
+
     {% endif %}
 {% endif %}
 
@@ -323,6 +323,22 @@
         rows="4"
         cols="60"
     ></textarea>
+
+    <script>
+        const demandaAtendida = document.getElementById('demanda_atendida');
+        const motivoNaoAtendida = document.getElementById('motivo_nao_atendida');
+
+        function atualizarMotivo() {
+            if (demandaAtendida.value === 'NAO') {
+                motivoNaoAtendida.required = true;
+            } else {
+                motivoNaoAtendida.required = false;
+            }
+        }
+
+        demandaAtendida.addEventListener('change', atualizarMotivo);
+        atualizarMotivo();
+    </script>
 
     <br><br>
 

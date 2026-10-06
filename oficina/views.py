@@ -612,6 +612,9 @@ def adicionar_peca(request, numero):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Mecânicos').exists()
 )
+@user_passes_test(
+    lambda user: user.is_superuser or user.groups.filter(name='Mecânicos').exists()
+)
 def adicionar_observacao(request, numero):
 
     ordem = get_object_or_404(
