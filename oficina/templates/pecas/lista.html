@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Peças</title>
+</head>
+<body>
+
+<h1>Peças cadastradas</h1>
+
+<a href="{% url 'criar_peca' %}">
+    Nova peça
+</a>
+
+<br><br>
+
+{% for peca in pecas %}
+
+    <div>
+        <strong>{{ peca.nome }}</strong>
+
+        <br>
+        <a href="{% url 'editar_peca' peca.id %}">
+            Editar
+        </a>
+        Descrição: {{ peca.descricao }}
+
+        <br>
+
+        Preço: R$ {{ peca.preco }}
+
+        <br>
+
+        Estoque atual: {{ peca.estoque }}
+
+        <br>
+
+        Estoque mínimo: {{ peca.estoque_minimo }}
+
+        <br>
+
+        Status:
+        {% if peca.ativo %}
+            Ativo
+        {% else %}
+            Inativo
+        {% endif %}
+    </div>
+
+    <hr>
+
+{% empty %}
+
+    <p>Nenhuma peça cadastrada.</p>
+
+{% endfor %}
+
+</body>
+</html>

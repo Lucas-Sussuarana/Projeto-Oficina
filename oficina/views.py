@@ -227,6 +227,79 @@ def editar_servico(request, id):
     )
 
 # ========================
+# PEÇAS
+# ========================
+
+@user_passes_test(
+    lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
+)
+def criar_peca(request):
+
+    if request.method == 'POST':
+        nome = request.POST.get('nome')
+        descricao = request.POST.get('descricao')
+        preco = request.POST.get('preco')
+        estoque_minimo = request.POST.get('estoque_minimo')
+
+        if nome and preco and estoque_minimo:
+            Peca.objects.create(
+                nome=nome,
+                descricao=descricao,
+                preco=preco,
+                estoque_minimo=estoque_minimo
+            )
+
+            return redirect('lista_pecas')
+
+    return render(
+        request,
+        'pecas/form.html'
+    )
+
+@user_passes_test(
+    lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
+)
+def lista_pecas(request):
+
+    pecas = Peca.objects.all().order_by('nome')
+
+    return render(
+        request,
+        'pecas/lista.html',
+        {'pecas': pecas}
+    )
+
+@user_passes_test(
+    lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
+)
+def editar_peca(request, id):
+
+    peca = get_object_or_404(Peca, id=id)
+
+    if request.method == 'POST':
+        nome = request.POST.get('nome')
+        descricao = request.POST.get('descricao')
+        preco = request.POST.get('preco')
+        estoque_minimo = request.POST.get('estoque_minimo')
+        ativo = request.POST.get('ativo')
+
+        if nome and preco and estoque_minimo:
+            peca.nome = nome
+            peca.descricao = descricao
+            peca.preco = preco
+            peca.estoque_minimo = estoque_minimo
+            peca.ativo = ativo == 'on'
+            peca.save()
+
+            return redirect('lista_pecas')
+
+    return render(
+        request,
+        'pecas/form.html',
+        {'peca': peca}
+    )
+
+# ========================
 # ORDENS DE SERVIÇO
 # ========================
 @user_passes_test(

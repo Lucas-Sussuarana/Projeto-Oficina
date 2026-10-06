@@ -120,4 +120,23 @@ urlpatterns = [
         views.editar_servico,
         name='editar_servico'
     ),
+
+    path(
+        'pecas/novo/',
+        views.criar_peca,
+        name='criar_peca'
+    ),
+
+    path(
+        'pecas/',
+        views.lista_pecas,
+        name='lista_pecas'
+    ),
+
+    path(
+        'pecas/editar/<int:id>/',
+        views.editar_peca,
+        name='editar_peca'
+    ),
+
 ]

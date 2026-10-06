@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>
+        {% if peca %}
+            Editar Peça
+        {% else %}
+            Cadastro de Peça
+        {% endif %}
+    </title>
+</head>
+<body>
+
+{% if peca %}
+    <h1>Editar Peça</h1>
+{% else %}
+    <h1>Nova Peça</h1>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+
+    <p>
+        <label for="nome">Nome:</label><br>
+        <input
+            type="text"
+            name="nome"
+            id="nome"
+            value="{{ peca.nome|default:'' }}"
+            required
+        >
+    </p>
+
+    <p>
+        <label for="descricao">Descrição:</label><br>
+        <textarea
+            name="descricao"
+            id="descricao"
+            rows="4"
+        >{{ peca.descricao|default:'' }}</textarea>
+    </p>
+
+    <p>
+        <label for="preco">Preço:</label><br>
+        <input
+            type="number"
+            name="preco"
+            id="preco"
+            min="0"
+            step="0.01"
+            value="{{ peca.preco|default:'' }}"
+            required
+        >
+    </p>
+
+    <p>
+        <label for="estoque_minimo">Estoque mínimo:</label><br>
+        <input
+            type="number"
+            name="estoque_minimo"
+            id="estoque_minimo"
+            min="0"
+            step="0.01"
+            value="{{ peca.estoque_minimo|default:'0' }}"
+            required
+        >
+    </p>
+
+    {% if peca %}
+        <p>
+            Estoque atual: {{ peca.estoque }}
+        </p>
+
+        <p>
+            <label>
+                <input
+                    type="checkbox"
+                    name="ativo"
+                    {% if peca.ativo %}checked{% endif %}
+                >
+                Peça ativa
+            </label>
+        </p>
+    {% endif %}
+
+    <button type="submit">
+        {% if peca %}
+            Salvar alterações
+        {% else %}
+            Salvar peça
+        {% endif %}
+    </button>
+</form>
+
+<br>
+
+<a href="{% url 'lista_pecas' %}">
+    Voltar para peças
+</a>
+
+</body>
+</html>
