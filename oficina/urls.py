@@ -44,6 +44,12 @@ urlpatterns = [
     ),
 
     path(
+        'ordens/mecanico/',
+        views.lista_ordens_mecanico,
+        name='lista_ordens_mecanico'
+    ),
+
+    path(
         'ordens/<int:numero>/',
         views.detalhe_ordem_servico,
         name='detalhe_ordem_servico'

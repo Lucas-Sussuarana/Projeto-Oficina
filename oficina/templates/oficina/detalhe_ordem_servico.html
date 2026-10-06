@@ -5,16 +5,18 @@
 </head>
 <body>
 
-{% if ordem.status == 'ABERTA' %}
+{% if ordem.status == 'ABERTA' or ordem.status == 'EM_ATENDIMENTO' %}
+    {% if not participacao_aberta %}
 
-<form method="post" action="{% url 'iniciar_atendimento' ordem.numero %}">
-    {% csrf_token %}
+    <form method="post" action="{% url 'iniciar_atendimento' ordem.numero %}">
+        {% csrf_token %}
 
-    <button type="submit">
-        Iniciar atendimento
-    </button>
-</form>
-
+        <button type="submit">
+            Iniciar atendimento
+        </button>
+    </form>
+    
+    {% endif %}
 {% endif %}
 
 <h1>Ordem de Serviço nº {{ ordem.numero }}</h1>

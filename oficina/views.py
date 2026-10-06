@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Cliente, Veiculo, Servico, Peca, ItemServico, ItemPeca, Observacao, OrdemServico,  MovimentacaoEstoque
+from .models import Cliente, Veiculo, Servico, Peca, ItemServico, ItemPeca, Observacao, OrdemServico,  MovimentacaoEstoque,  ParticipacaoMecanico
 from .forms import ClienteForm, VeiculoForm, OrdemServicoForm
 
 @login_required
@@ -432,6 +432,27 @@ def lista_ordens_servico(request):
         ).exists()
     )
 )
+
+@login_required
+@user_passes_test(
+    lambda user: user.is_superuser or user.groups.filter(name='Mecânicos').exists()
+)
+def lista_ordens_mecanico(request):
+    ordens = OrdemServico.objects.filter(
+        status__in=['ABERTA', 'EM_ATENDIMENTO']
+    ).select_related(
+        'cliente',
+        'veiculo'
+    ).prefetch_related(
+        'participacoes_mecanicos__mecanico'
+    ).order_by('data_abertura')
+
+    return render(
+        request,
+        'oficina/lista_ordens_mecanico.html',
+        {'ordens': ordens}
+    )
+
 def detalhe_ordem_servico(request, numero):
 
     ordem = get_object_or_404(
@@ -450,6 +471,12 @@ def detalhe_ordem_servico(request, numero):
         ativo=True
     ).order_by('nome')
 
+    participacao_aberta = ParticipacaoMecanico.objects.filter(
+        ordem_servico=ordem,
+        mecanico=request.user,
+        data_saida__isnull=True
+    ).exists()
+
     return render(
         request,
         'oficina/detalhe_ordem_servico.html',
@@ -457,6 +484,7 @@ def detalhe_ordem_servico(request, numero):
             'ordem': ordem,
             'servicos': servicos,
             'pecas': pecas,
+            'participacao_aberta': participacao_aberta,
         }
     )
 
@@ -471,6 +499,20 @@ def iniciar_atendimento(request, numero):
     )
 
     if request.method == 'POST':
+
+        participacao_existente = ParticipacaoMecanico.objects.filter(
+            ordem_servico=ordem,
+            mecanico=request.user,
+            data_saida__isnull=True
+        ).exists()
+
+        if not participacao_existente:
+
+            ParticipacaoMecanico.objects.create(
+                ordem_servico=ordem,
+                mecanico=request.user
+            )
+
         if ordem.status == 'ABERTA':
             ordem.status = 'EM_ATENDIMENTO'
             ordem.save()
@@ -484,7 +526,6 @@ def iniciar_atendimento(request, numero):
         'detalhe_ordem_servico',
         numero=ordem.numero
     )
-
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Mecânicos').exists()
 )
@@ -638,6 +679,17 @@ def finalizar_ordem_servico(request, numero):
         from django.utils import timezone
 
         ordem.data_finalizacao = timezone.now()
+
+        ordem.data_finalizacao = timezone.now()
+
+        data_saida = ordem.data_finalizacao
+
+        ParticipacaoMecanico.objects.filter(
+            ordem_servico=ordem,
+            data_saida__isnull=True
+        ).update(
+            data_saida=data_saida
+        )
 
         ordem.save()
 

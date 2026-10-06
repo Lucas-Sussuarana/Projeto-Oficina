@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ordens de Serviço - Mecânico</title>
+</head>
+<body>
+
+<h1>Ordens de Serviço</h1>
+
+{% for ordem in ordens %}
+    <div>
+        <strong>OS #{{ ordem.numero }}</strong>
+        <br>
+
+        Cliente: {{ ordem.cliente.nome }}
+        <br>
+
+        Veículo: {{ ordem.veiculo.modelo }} - {{ ordem.veiculo.placa }}
+        <br>
+
+        Solicitação:
+        {{ ordem.solicitacao_cliente }}
+        <br>
+
+        Status: {{ ordem.get_status_display }}
+        <br>
+
+        Mecânicos participantes:
+        {% for participacao in ordem.participacoes_mecanicos.all %}
+            {{ participacao.mecanico.username }}
+            {% if not forloop.last %}, {% endif %}
+        {% empty %}
+            Nenhum mecânico iniciou o atendimento.
+        {% endfor %}
+
+        <a href="{% url 'detalhe_ordem_servico' ordem.numero %}">
+            Abrir OS
+        </a>
+    </div>
+
+
+    
+    <hr>
+
+{% empty %}
+    <p>Nenhuma Ordem de Serviço disponível.</p>
+{% endfor %}
+
+</body>
+</html>
