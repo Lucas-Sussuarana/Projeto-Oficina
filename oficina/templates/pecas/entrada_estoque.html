@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Entrada de Estoque</title>
+</head>
+<body>
+
+<h1>Entrada de Estoque</h1>
+
+<p>
+    Peça:
+    <strong>{{ peca.nome }}</strong>
+</p>
+
+<p>
+    Estoque atual:
+    <strong>{{ peca.estoque }}</strong>
+</p>
+
+<form method="post">
+    {% csrf_token %}
+
+    <p>
+        <label for="quantidade">Quantidade de entrada:</label><br>
+        <input
+            type="number"
+            name="quantidade"
+            id="quantidade"
+            min="0.01"
+            step="0.01"
+            required
+        >
+    </p>
+
+    <p>
+        <label for="observacao">Observação:</label><br>
+        <textarea
+            name="observacao"
+            id="observacao"
+            rows="4"
+        ></textarea>
+    </p>
+
+    <button type="submit">
+        Registrar entrada
+    </button>
+</form>
+
+<br>
+
+<a href="{% url 'lista_pecas' %}">
+    Voltar para peças
+</a>
+
+</body>
+</html>

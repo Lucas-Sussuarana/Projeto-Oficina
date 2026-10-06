@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Cliente, Veiculo, Servico, Peca, ItemServico, ItemPeca, Observacao, OrdemServico
+from .models import Cliente, Veiculo, Servico, Peca, ItemServico, ItemPeca, Observacao, OrdemServico,  MovimentacaoEstoque
 from .forms import ClienteForm, VeiculoForm, OrdemServicoForm
 
 @login_required
@@ -296,6 +296,46 @@ def editar_peca(request, id):
     return render(
         request,
         'pecas/form.html',
+        {'peca': peca}
+    )
+
+# ========================
+# ENTRADA DE ESTOQUE
+# ========================
+
+@user_passes_test(
+    lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
+)
+def entrada_estoque(request, id):
+
+    peca = get_object_or_404(
+        Peca,
+        id=id,
+        ativo=True
+    )
+
+    if request.method == 'POST':
+        from decimal import Decimal
+
+        quantidade = request.POST.get('quantidade')
+        observacao = request.POST.get('observacao')
+
+        if quantidade:
+            quantidade = Decimal(quantidade)
+
+            MovimentacaoEstoque.objects.create(
+                peca=peca,
+                tipo='ENTRADA',
+                quantidade=quantidade,
+                usuario=request.user,
+                observacao=observacao
+            )
+
+            return redirect('lista_pecas')
+
+    return render(
+        request,
+        'pecas/entrada_estoque.html',
         {'peca': peca}
     )
 

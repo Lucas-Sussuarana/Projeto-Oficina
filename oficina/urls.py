@@ -139,4 +139,10 @@ urlpatterns = [
         name='editar_peca'
     ),
 
+    path(
+        'pecas/<int:id>/entrada-estoque/',
+        views.entrada_estoque,
+        name='entrada_estoque'
+    ),
+
 ]
