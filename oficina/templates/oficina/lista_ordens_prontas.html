@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ordens de Serviço Prontas</title>
+</head>
+<body>
+
+<h1>Ordens de Serviço Prontas</h1>
+
+{% for ordem in ordens %}
+    <div>
+        <strong>OS #{{ ordem.numero }}</strong>
+        <br>
+        Cliente: {{ ordem.cliente.nome }}
+        <br>
+        Veículo: {{ ordem.veiculo.modelo }} - {{ ordem.veiculo.placa }}
+        <br>
+        Data de finalização: {{ ordem.data_finalizacao }}
+        <br>
+        Finalizado por: {{ ordem.finalizado_por.username }}
+        <br>
+        Status: {{ ordem.get_status_display }}
+        <br><br>
+
+        <a href="{% url 'detalhe_ordem_servico' ordem.numero %}">
+            Abrir OS
+        </a>
+    </div>
+
+    <hr>
+
+{% empty %}
+    <p>Nenhuma Ordem de Serviço pronta para entrega.</p>
+{% endfor %}
+
+</body>
+</html>

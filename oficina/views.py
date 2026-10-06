@@ -399,13 +399,10 @@ def veiculos_por_cliente(request):
         'oficina/veiculos_options.html',
         {'veiculos': veiculos}
     )
+
+
 @user_passes_test(
-    lambda user: (
-        user.is_superuser
-        or user.groups.filter(
-            name__in=['Mecânicos', 'Recepcionistas']
-        ).exists()
-    )
+    lambda user: user.is_superuser or user.groups.filter( name__in=['Mecânicos', 'Recepcionistas'] ).exists()
 )
 def lista_ordens_servico(request):
 
@@ -432,6 +429,49 @@ def lista_ordens_servico(request):
         ).exists()
     )
 )
+
+@user_passes_test(
+    lambda user:  user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
+)
+def lista_ordens_prontas(request):
+
+    ordens = OrdemServico.objects.filter(
+        status='PRONTO'
+    ).select_related(
+        'cliente',
+        'veiculo',
+        'finalizado_por'
+    ).order_by(
+        '-data_finalizacao'
+    )
+
+    return render(
+        request,
+        'oficina/lista_ordens_prontas.html',
+        {'ordens': ordens}
+    )
+
+@login_required
+@user_passes_test(
+    lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()  
+)
+def lista_ordens_entregues(request):
+
+    ordens = OrdemServico.objects.filter(
+        status='ENTREGUE'
+    ).select_related(
+        'cliente',
+        'veiculo',
+        'finalizado_por'
+    ).order_by(
+        '-data_finalizacao'
+    )
+
+    return render(
+        request,
+        'oficina/lista_ordens_entregues.html',
+        {'ordens': ordens}
+    )
 
 @login_required
 @user_passes_test(

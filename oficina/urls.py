@@ -151,4 +151,16 @@ urlpatterns = [
         name='entrada_estoque'
     ),
 
+    path(
+        'ordens/prontas/',
+        views.lista_ordens_prontas,
+        name='lista_ordens_prontas'
+    ),
+
+    path(
+        'ordens/entregues/',
+        views.lista_ordens_entregues,
+        name='lista_ordens_entregues'
+    ),
+
 ]
