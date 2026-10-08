@@ -76,7 +76,14 @@
 </p>
 
 <h2>Status</h2>
+{% if ordem.status == 'CANCELADA' %}
+    <h2>Cancelamento da OS</h2>
 
+    <p>
+        <strong>Motivo:</strong>
+        {{ ordem.motivo_cancelamento|default:"Motivo não informado." }}
+    </p>
+{% endif %}
 <h2>Serviços realizados</h2>
 
 {% if ordem.itens_servico.all %}
@@ -379,5 +386,33 @@
 
 {% endif %}
 
+{% if ordem.status == 'ABERTA' or ordem.status == 'EM_ATENDIMENTO' %}
+    {% if pode_cancelar %}
+        <h2>Cancelar Ordem de Serviço</h2>
+
+        <form method="post" action="{% url 'cancelar_ordem_servico' ordem.numero %}">
+            {% csrf_token %}
+
+            <label for="motivo_cancelamento">
+                Motivo do cancelamento:
+            </label>
+            <br>
+
+            <textarea
+                name="motivo_cancelamento"
+                id="motivo_cancelamento"
+                rows="4"
+                cols="60"
+                required
+            ></textarea>
+
+            <br><br>
+
+            <button type="submit">
+                Cancelar OS
+            </button>
+        </form>
+    {% endif %}
+{% endif %}
 </body>
 </html>

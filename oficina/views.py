@@ -537,6 +537,13 @@ def detalhe_ordem_servico(request, numero):
         data_saida__isnull=True
     ).exists()
 
+    pode_cancelar = (
+        request.user.is_superuser
+        or request.user.groups.filter(
+            name='Recepcionistas'
+        ).exists()
+    )
+    
     return render(
         request,
         'oficina/detalhe_ordem_servico.html',
@@ -545,6 +552,7 @@ def detalhe_ordem_servico(request, numero):
             'servicos': servicos,
             'pecas': pecas,
             'participacao_aberta': participacao_aberta,
+            'pode_cancelar': pode_cancelar,
         }
     )
 
@@ -557,6 +565,17 @@ def iniciar_atendimento(request, numero):
         OrdemServico,
         numero=numero
     )
+
+    if ordem.status in ['PRONTO', 'ENTREGUE', 'CANCELADA']:
+        from django.contrib import messages
+        messages.error(
+            request,
+            'Não é possível iniciar atendimento nesta OS.'
+        )
+        return redirect(
+            'detalhe_ordem_servico',
+            numero=ordem.numero
+        )
 
     if request.method == 'POST':
 
@@ -607,6 +626,17 @@ def adicionar_servico(request, numero):
             ativo=True
         )
 
+        if ordem.status != 'EM_ATENDIMENTO':
+            from django.contrib import messages
+            messages.error(
+                request,
+                'Só é possível adicionar serviços a uma OS em atendimento.'
+            )
+            return redirect(
+                'detalhe_ordem_servico',
+                numero=ordem.numero
+            )
+
         from decimal import Decimal
 
         quantidade = Decimal(quantidade)
@@ -648,6 +678,17 @@ def adicionar_peca(request, numero):
             ativo=True
         )
 
+        if ordem.status != 'EM_ATENDIMENTO':
+            from django.contrib import messages
+            messages.error(
+                request,
+                'Só é possível adicionar peças a uma OS em atendimento.'
+            )
+            return redirect(
+                'detalhe_ordem_servico',
+                numero=ordem.numero
+            )
+
         from decimal import Decimal
 
         quantidade = Decimal(quantidade)
@@ -682,6 +723,17 @@ def adicionar_observacao(request, numero):
         numero=numero
     )
 
+    if ordem.status != 'EM_ATENDIMENTO':
+        from django.contrib import messages
+        messages.error(
+            request,
+            'Só é possível registrar observações em uma OS em atendimento.'
+        )
+        return redirect(
+            'detalhe_ordem_servico',
+            numero=ordem.numero
+        )
+
     if request.method == 'POST':
 
         texto = request.POST.get('texto')
@@ -712,6 +764,17 @@ def finalizar_ordem_servico(request, numero):
         OrdemServico,
         numero=numero
     )
+
+    if ordem.status != 'EM_ATENDIMENTO':
+        from django.contrib import messages
+        messages.error(
+            request,
+            'Só é possível finalizar uma OS em atendimento.'
+        )
+        return redirect(
+            'detalhe_ordem_servico',
+            numero=ordem.numero
+        )
 
     if request.method == 'POST':
 
@@ -777,10 +840,62 @@ def entregar_ordem_servico(request, numero):
         numero=numero
     )
 
+    if ordem.status != 'PRONTO':
+        from django.contrib import messages
+        messages.error(
+            request,
+            'Só é possível entregar uma OS que esteja pronta.'
+        )
+        return redirect(
+            'detalhe_ordem_servico',
+            numero=ordem.numero
+        )
+
     if request.method == 'POST':
 
         if ordem.status == 'PRONTO':
             ordem.status = 'ENTREGUE'
+            ordem.save()
+
+        return redirect(
+            'detalhe_ordem_servico',
+            numero=ordem.numero
+        )
+
+    return redirect(
+        'detalhe_ordem_servico',
+        numero=ordem.numero
+    )
+@login_required
+@user_passes_test(
+    lambda user: (
+        user.is_superuser
+        or user.groups.filter(name='Recepcionistas').exists()
+    )
+)
+def cancelar_ordem_servico(request, numero):
+    ordem = get_object_or_404(
+        OrdemServico,
+        numero=numero
+    )
+
+    if ordem.status not in ['ABERTA', 'EM_ATENDIMENTO']:
+        from django.contrib import messages
+        messages.error(
+            request,
+            'Só é possível cancelar uma OS aberta ou em atendimento.'
+        )
+        return redirect(
+            'detalhe_ordem_servico',
+            numero=ordem.numero
+        )
+
+    if request.method == 'POST':
+        motivo = request.POST.get('motivo_cancelamento')
+
+        if motivo:
+            ordem.motivo_cancelamento = motivo
+            ordem.status = 'CANCELADA'
             ordem.save()
 
         return redirect(
