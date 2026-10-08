@@ -493,8 +493,8 @@ def lista_ordens_mecanico(request):
         {'ordens': ordens}
     )
 
+@login_required
 def detalhe_ordem_servico(request, numero):
-
     ordem = get_object_or_404(
         OrdemServico.objects.select_related(
             'cliente',
@@ -502,6 +502,26 @@ def detalhe_ordem_servico(request, numero):
         ),
         numero=numero
     )
+
+    eh_admin = request.user.is_superuser
+    eh_recepcionista = request.user.groups.filter(
+        name='Recepcionistas'
+    ).exists()
+    eh_mecanico = request.user.groups.filter(
+        name='Mecânicos'
+    ).exists()
+
+    if eh_mecanico and not (eh_admin or eh_recepcionista):
+        participou = ParticipacaoMecanico.objects.filter(
+            ordem_servico=ordem,
+            mecanico=request.user
+        ).exists()
+
+        if ordem.status in ['PRONTO', 'ENTREGUE'] and not participou:
+            from django.core.exceptions import PermissionDenied
+            raise PermissionDenied(
+                "Você não participou desta Ordem de Serviço."
+            )
 
     servicos = Servico.objects.filter(
         ativo=True
