@@ -894,10 +894,29 @@ def cancelar_ordem_servico(request, numero):
         motivo = request.POST.get('motivo_cancelamento')
 
         if motivo:
-            ordem.motivo_cancelamento = motivo
-            ordem.status = 'CANCELADA'
-            ordem.save()
+            from django.db import transaction
 
+            with transaction.atomic():
+                itens = ItemPeca.objects.filter(
+                    ordem_servico=ordem
+                ).select_related('peca')
+
+                for item in itens:
+                    MovimentacaoEstoque.objects.create(
+                        peca=item.peca,
+                        tipo='ENTRADA',
+                        quantidade=item.quantidade,
+                        ordem_servico=ordem,
+                        usuario=request.user,
+                        observacao=(
+                            f'Devolução automática por cancelamento '
+                            f'da OS #{ordem.numero}'
+                        )
+                    )
+
+                ordem.motivo_cancelamento = motivo
+                ordem.status = 'CANCELADA'
+                ordem.save()
         return redirect(
             'detalhe_ordem_servico',
             numero=ordem.numero
