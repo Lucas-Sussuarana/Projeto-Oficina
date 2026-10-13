@@ -163,6 +163,14 @@ urlpatterns = [
         name='lista_ordens_entregues'
     ),
 
+
+    path(
+        'ordens/canceladas/',
+        views.lista_ordens_canceladas,
+        name='lista_ordens_canceladas'
+    ),
+
+
     path(
         'ordens/<int:numero>/cancelar/',
         views.cancelar_ordem_servico,

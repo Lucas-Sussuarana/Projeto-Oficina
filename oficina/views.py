@@ -3,9 +3,29 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Cliente, Veiculo, Servico, Peca, ItemServico, ItemPeca, Observacao, OrdemServico,  MovimentacaoEstoque,  ParticipacaoMecanico
 from .forms import ClienteForm, VeiculoForm, OrdemServicoForm
 
+
 @login_required
 def home(request):
-    return render(request, 'home.html')
+    eh_admin = request.user.is_superuser
+
+    eh_recepcionista = request.user.groups.filter(
+        name='Recepcionistas'
+    ).exists()
+
+    eh_mecanico = request.user.groups.filter(
+        name='Mecânicos'
+    ).exists()
+
+    return render(
+        request,
+        'home.html',
+        {
+            'eh_admin': eh_admin,
+            'eh_recepcionista': eh_recepcionista,
+            'eh_mecanico': eh_mecanico,
+        }
+    )
+
 
 
 # ========================
@@ -473,6 +493,29 @@ def lista_ordens_entregues(request):
         {'ordens': ordens}
     )
 
+
+@login_required
+@user_passes_test(
+    lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
+)
+
+def lista_ordens_canceladas(request):
+    ordens = OrdemServico.objects.filter(
+        status='CANCELADA'
+    ).select_related(
+        'cliente',
+        'veiculo'
+    ).order_by(
+        '-data_atualizacao'
+    )
+
+    return render(
+        request,
+        'oficina/lista_ordens_canceladas.html',
+        {'ordens': ordens}
+    )
+
+
 @login_required
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Mecânicos').exists()
@@ -713,9 +756,6 @@ def adicionar_peca(request, numero):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Mecânicos').exists()
 )
-@user_passes_test(
-    lambda user: user.is_superuser or user.groups.filter(name='Mecânicos').exists()
-)
 def adicionar_observacao(request, numero):
 
     ordem = get_object_or_404(
@@ -830,9 +870,9 @@ def finalizar_ordem_servico(request, numero):
     )
 
 @user_passes_test(
-    lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists(),
-
+    lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
+
 def entregar_ordem_servico(request, numero):
 
     ordem = get_object_or_404(
@@ -868,10 +908,7 @@ def entregar_ordem_servico(request, numero):
     )
 @login_required
 @user_passes_test(
-    lambda user: (
-        user.is_superuser
-        or user.groups.filter(name='Recepcionistas').exists()
-    )
+    lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
 def cancelar_ordem_servico(request, numero):
     ordem = get_object_or_404(
