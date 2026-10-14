@@ -33,9 +33,10 @@ def home(request):
 # ========================
 
 # LISTAR
-@user_passes_test(
-    lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
+@login_required
+@user_passes_test(lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
+
 def lista_clientes(request):
     clientes = Cliente.objects.all()
 
@@ -46,10 +47,12 @@ def lista_clientes(request):
     )
 
 
+
 # CRIAR
-@user_passes_test(
-    lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
+@login_required
+@user_passes_test(lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
+
 def criar_cliente(request):
 
     if request.method == 'POST':
@@ -70,6 +73,7 @@ def criar_cliente(request):
 
 
 # EDITAR
+@login_required
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
@@ -98,6 +102,7 @@ def editar_cliente(request, id):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
+
 def excluir_cliente(request, id):
 
     cliente = get_object_or_404(Cliente, id=id)
@@ -118,6 +123,7 @@ def excluir_cliente(request, id):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
+
 def criar_veiculo(request):
     if request.method == 'POST':
         form = VeiculoForm(request.POST)
@@ -139,6 +145,7 @@ def criar_veiculo(request):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
+
 def editar_veiculo(request, id):
 
     veiculo = get_object_or_404(Veiculo, id=id)
@@ -163,6 +170,7 @@ def editar_veiculo(request, id):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
+
 def excluir_veiculo(request, id):
 
     veiculo = get_object_or_404(Veiculo, id=id)
@@ -184,6 +192,7 @@ def excluir_veiculo(request, id):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
+
 def criar_servico(request):
 
     if request.method == 'POST':
@@ -208,6 +217,7 @@ def criar_servico(request):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
+
 def lista_servicos(request):
 
     servicos = Servico.objects.all().order_by('nome')
@@ -221,6 +231,7 @@ def lista_servicos(request):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
+
 def editar_servico(request, id):
 
     servico = get_object_or_404(Servico, id=id)
@@ -253,6 +264,7 @@ def editar_servico(request, id):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
+
 def criar_peca(request):
 
     if request.method == 'POST':
@@ -279,6 +291,7 @@ def criar_peca(request):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
+
 def lista_pecas(request):
 
     pecas = Peca.objects.all().order_by('nome')
@@ -292,6 +305,7 @@ def lista_pecas(request):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
+
 def editar_peca(request, id):
 
     peca = get_object_or_404(Peca, id=id)
@@ -326,6 +340,7 @@ def editar_peca(request, id):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
+
 def entrada_estoque(request, id):
 
     peca = get_object_or_404(
@@ -365,6 +380,7 @@ def entrada_estoque(request, id):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
+
 def abrir_ordem_servico(request):
 
     if request.method == 'POST':
@@ -399,6 +415,7 @@ def ordem_servico_criada(request, numero):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
+
 def veiculos_por_cliente(request):
     cliente_id = request.GET.get('cliente_id')
 
@@ -424,6 +441,7 @@ def veiculos_por_cliente(request):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter( name__in=['Mecânicos', 'Recepcionistas'] ).exists()
 )
+
 def lista_ordens_servico(request):
 
     ordens = OrdemServico.objects.filter(
@@ -453,6 +471,7 @@ def lista_ordens_servico(request):
 @user_passes_test(
     lambda user:  user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
+
 def lista_ordens_prontas(request):
 
     ordens = OrdemServico.objects.filter(
@@ -475,6 +494,7 @@ def lista_ordens_prontas(request):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()  
 )
+
 def lista_ordens_entregues(request):
 
     ordens = OrdemServico.objects.filter(
@@ -520,6 +540,7 @@ def lista_ordens_canceladas(request):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Mecânicos').exists()
 )
+
 def lista_ordens_mecanico(request):
     ordens = OrdemServico.objects.filter(
         status__in=['ABERTA', 'EM_ATENDIMENTO']
@@ -602,6 +623,7 @@ def detalhe_ordem_servico(request, numero):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Mecânicos').exists()
 )
+
 def iniciar_atendimento(request, numero):
 
     ordem = get_object_or_404(
@@ -651,6 +673,7 @@ def iniciar_atendimento(request, numero):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Mecânicos').exists()
 )
+
 def adicionar_servico(request, numero):
 
     ordem = get_object_or_404(
@@ -703,6 +726,7 @@ def adicionar_servico(request, numero):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Mecânicos').exists()
 )
+
 def adicionar_peca(request, numero):
 
     ordem = get_object_or_404(
@@ -756,6 +780,7 @@ def adicionar_peca(request, numero):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Mecânicos').exists()
 )
+
 def adicionar_observacao(request, numero):
 
     ordem = get_object_or_404(
@@ -798,6 +823,7 @@ def adicionar_observacao(request, numero):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Mecânicos').exists()
 )
+
 def finalizar_ordem_servico(request, numero):
 
     ordem = get_object_or_404(
@@ -910,6 +936,7 @@ def entregar_ordem_servico(request, numero):
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
 )
+
 def cancelar_ordem_servico(request, numero):
     ordem = get_object_or_404(
         OrdemServico,
