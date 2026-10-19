@@ -403,6 +403,9 @@ def abrir_ordem_servico(request):
         {'form': form}
     )
 
+@user_passes_test(
+    lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
+)
 
 def ordem_servico_criada(request, numero):
 
@@ -439,7 +442,7 @@ def veiculos_por_cliente(request):
 
 
 @user_passes_test(
-    lambda user: user.is_superuser or user.groups.filter( name__in=['Mecânicos', 'Recepcionistas'] ).exists()
+    lambda user: user.is_superuser or user.groups.filter(name__in=['Mecânicos', 'Recepcionistas'] ).exists()
 )
 
 def lista_ordens_servico(request):
@@ -558,6 +561,9 @@ def lista_ordens_mecanico(request):
     )
 
 @login_required
+@user_passes_test(
+    lambda user: user.is_superuser or user.groups.filter(name__in=['Mecânicos', 'Recepcionistas']).exists()
+)
 def detalhe_ordem_servico(request, numero):
     ordem = get_object_or_404(
         OrdemServico.objects.select_related(
@@ -631,6 +637,12 @@ def iniciar_atendimento(request, numero):
         numero=numero
     )
 
+    if request.method != 'POST':
+        return redirect(
+            'detalhe_ordem_servico',
+            numero=ordem.numero
+        )
+
     if ordem.status in ['PRONTO', 'ENTREGUE', 'CANCELADA']:
         from django.contrib import messages
         messages.error(
@@ -670,6 +682,7 @@ def iniciar_atendimento(request, numero):
         'detalhe_ordem_servico',
         numero=ordem.numero
     )
+
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Mecânicos').exists()
 )
