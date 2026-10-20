@@ -1,28 +1,33 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Clientes</title>
 
-    <!-- Bootstrap CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+{% extends "base.html" %}
 
-<body>
+{% block title %}Clientes | TESI Oficina{% endblock %}
 
-<div class="container mt-4">
+{% block breadcrumb %}Cadastros / Clientes{% endblock %}
 
-    <h2>Lista de Clientes</h2>
+{% block content %}
 
-<a href="{% url 'criar_cliente' %}" class="btn btn-primary mb-3">
-    Novo Cliente
-</a>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h2>Clientes</h2>
+        <p class="text-muted mb-0">
+            Cadastro e consulta de clientes da oficina.
+        </p>
+    </div>
 
-    <table class="table table-striped table-hover">
+    <a href="{% url 'criar_cliente' %}" class="btn btn-success">
+        + Novo Cliente
+    </a>
+</div>
+
+<div class="table-responsive">
+
+    <table class="table table-striped table-hover align-middle">
 
         <thead class="table-dark">
             <tr>
                 <th>Nome</th>
-                <th>Veiculos</th>
+                <th>Veículos</th>
                 <th>CPF/CNPJ</th>
                 <th>Telefone</th>
                 <th>Cidade</th>
@@ -38,19 +43,26 @@
 
                 <td>
                     {% for veiculo in cliente.veiculos.all %}
-                        {{ veiculo.modelo }} - {{ veiculo.placa }}
+                        <div class="mb-2">
+                            <strong>{{ veiculo.modelo }}</strong>
+                            - {{ veiculo.placa }}
 
-                        <a href="{% url 'editar_veiculo' veiculo.id %}">
-                            Editar
-                        </a>
+                            <div class="mt-1">
+                                <a href="{% url 'editar_veiculo' veiculo.id %}"
+                                   class="btn btn-outline-success btn-sm">
+                                    Editar veículo
+                                </a>
 
-                        <a href="{% url 'excluir_veiculo' veiculo.id %}">
-                            Excluir
-                        </a>
-
-                        <br>
+                                <a href="{% url 'excluir_veiculo' veiculo.id %}"
+                                   class="btn btn-outline-danger btn-sm">
+                                    Excluir veículo
+                                </a>
+                            </div>
+                        </div>
                     {% empty %}
-                        Nenhum veículo cadastrado.
+                        <span class="text-muted">
+                            Nenhum veículo cadastrado.
+                        </span>
                     {% endfor %}
                 </td>
 
@@ -59,18 +71,25 @@
                 <td>{{ cliente.cidade }}</td>
 
                 <td>
-                    <a href="{% url 'editar_cliente' cliente.id %}" class="btn btn-warning btn-sm">
-                        Editar
-                    </a>
-                    <a href="{% url 'excluir_cliente' cliente.id %}" class="btn btn-danger btn-sm">
-                        Excluir
-                    </a>
+                    <div class="d-flex flex-wrap gap-1">
+                        <a href="{% url 'editar_cliente' cliente.id %}"
+                           class="btn btn-outline-success btn-sm">
+                            Editar
+                        </a>
+
+                        <a href="{% url 'excluir_cliente' cliente.id %}"
+                           class="btn btn-outline-danger btn-sm">
+                            Excluir
+                        </a>
+                    </div>
                 </td>
             </tr>
 
             {% empty %}
             <tr>
-                <td colspan="5">Nenhum cliente cadastrado.</td>
+                <td colspan="6" class="text-center text-muted py-4">
+                    Nenhum cliente cadastrado.
+                </td>
             </tr>
             {% endfor %}
 
@@ -80,5 +99,4 @@
 
 </div>
 
-</body>
-</html>
+{% endblock %}
