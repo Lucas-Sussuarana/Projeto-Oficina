@@ -1,21 +1,207 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-    <title>TESI Oficina</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}TESI Oficina{% endblock %}</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #eeeeee;
+            color: #333333;
+        }
+
+        /* CABEÇALHO SUPERIOR */
+        .top-header {
+            height: 76px;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 6px;
+            background-color: #14532d;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .brand-name {
+            font-size: 25px;
+            font-weight: bold;
+            color: #14532d;
+        }
+
+        .user-info {
+            color: #555555;
+            font-size: 13px;
+            text-align: right;
+        }
+
+        /* MENU PRINCIPAL */
+        .main-nav {
+            min-height: 54px;
+            background-color: #14532d;
+            display: flex;
+            align-items: stretch;
+            gap: 5px;
+            padding: 5px 15px;
+            flex-wrap: wrap;
+        }
+
+        .main-nav a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 13px 18px;
+            display: flex;
+            align-items: center;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .main-nav a:hover,
+        .main-nav a:focus {
+            background-color: #276749;
+        }
+
+        /* ÁREA CENTRAL */
+        .page-background {
+            min-height: calc(100vh - 190px);
+            padding: 24px 30px;
+            background-color: #e9ece9;
+        }
+
+        .breadcrumb {
+            margin-bottom: 16px;
+            color: #526156;
+            font-size: 14px;
+        }
+
+        .content-area {
+            background-color: #ffffff;
+            min-height: 280px;
+            padding: 30px;
+            border-radius: 3px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        }
+
+        .content-area h2 {
+            margin-top: 0;
+            color: #333333;
+        }
+
+        /* RODAPÉ */
+        .footer {
+            min-height: 90px;
+            padding: 22px 30px;
+            background-color: #555b57;
+            color: #ffffff;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        /* ADAPTAÇÃO PARA TELAS MENORES */
+        @media (max-width: 600px) {
+            .top-header {
+                padding: 0 12px;
+                height: 68px;
+            }
+
+            .brand-name {
+                font-size: 19px;
+            }
+
+            .user-info {
+                font-size: 11px;
+            }
+
+            .main-nav {
+                padding: 5px;
+            }
+
+            .main-nav a {
+                padding: 10px;
+                font-size: 12px;
+            }
+
+            .page-background {
+                padding: 15px 10px;
+            }
+
+            .content-area {
+                padding: 18px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>Sistema TESI</h1>
+    <!-- CABEÇALHO -->
+    <header class="top-header">
+        <div class="brand">
+            <div class="brand-icon">T</div>
+            <div class="brand-name">TESI OFICINA</div>
+        </div>
 
-<nav>
-    <a href="/">Home</a> |
-    <a href="/clientes/">Clientes</a>
-</nav>
+        <div class="user-info">
+            <strong>Sistema de Gestão</strong><br>
+            Oficina
+        </div>
+    </header>
 
-<hr>
+    <!-- MENU DE NAVEGAÇÃO -->
+    <nav class="main-nav">
+        <a href="/">Início</a>
+        <a href="/clientes/">Clientes</a>
+        <a href="/veiculos/">Veículos</a>
+        <a href="/pecas/">Peças</a>
+        <a href="/servicos/">Serviços</a>
+        <a href="/ordens/">Ordens de Serviço</a>
+    </nav>
 
-{% block content %}
-{% endblock %}
+    <!-- CONTEÚDO VARIÁVEL -->
+    <main class="page-background">
+        <div class="breadcrumb">
+            Início / {% block breadcrumb %}Painel{% endblock %}
+        </div>
+
+        <section class="content-area">
+            {% block content %}
+            {% endblock %}
+        </section>
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="footer">
+        TESI Oficina — Sistema de Gestão<br>
+        Todos os direitos reservados.
+    </footer>
 
 </body>
 </html>

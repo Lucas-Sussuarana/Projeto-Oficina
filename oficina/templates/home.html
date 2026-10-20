@@ -1,12 +1,90 @@
 
-<h1>Sistema TESI</h1>
+{% extends "base.html" %}
 
-<ul>
-    <li><a href="/clientes/">Clientes</a></li>
-    <li><a href="/pecas/">Peças</a></li>
-    <li><a href="/servicos/">Serviços</a></li>
-    <li><a href="/ordens/">Ordens de Serviço em aberto/atendimento</a></li>
-    <li><a href="/ordens/prontas/">Ordens prontas para entrega</a></li>
-    <li><a href="/ordens/entregues/">Ordens entregues</a></li>
-    <li><a href="/ordens/canceladas/">Ordens canceladas</a></li>
-</ul>
+{% block title %}Início | TESI Oficina{% endblock %}
+
+{% block breadcrumb %}Painel inicial{% endblock %}
+
+{% block content %}
+
+<h2>Bem-vindo à TESI Oficina</h2>
+
+<p>Selecione uma das opções abaixo para continuar.</p>
+
+<div class="menu-inicial">
+
+    <a href="/clientes/" class="atalho">
+        <strong>Clientes</strong>
+        <span>Cadastro e consulta de clientes</span>
+    </a>
+
+    <a href="/pecas/" class="atalho">
+        <strong>Peças</strong>
+        <span>Cadastro e controle de peças</span>
+    </a>
+
+    <a href="/servicos/" class="atalho">
+        <strong>Serviços</strong>
+        <span>Cadastro dos serviços da oficina</span>
+    </a>
+
+    <a href="/ordens/" class="atalho">
+        <strong>Ordens de Serviço</strong>
+        <span>Ordens abertas e em atendimento</span>
+    </a>
+
+    <a href="/ordens/prontas/" class="atalho">
+        <strong>Prontas para entrega</strong>
+        <span>Veículos aguardando retirada</span>
+    </a>
+
+    <a href="/ordens/entregues/" class="atalho">
+        <strong>Ordens entregues</strong>
+        <span>Consultar serviços concluídos</span>
+    </a>
+
+    <a href="/ordens/canceladas/" class="atalho">
+        <strong>Ordens canceladas</strong>
+        <span>Consultar ordens canceladas</span>
+    </a>
+
+</div>
+
+<style>
+    .menu-inicial {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        margin-top: 25px;
+    }
+
+    .atalho {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 22px;
+        background-color: #f5f8f5;
+        border: 1px solid #d9e5dc;
+        border-left: 5px solid #14532d;
+        border-radius: 5px;
+        color: #26372b;
+        text-decoration: none;
+        transition: background-color 0.2s;
+    }
+
+    .atalho:hover {
+        background-color: #e4eee6;
+    }
+
+    .atalho strong {
+        font-size: 17px;
+        color: #14532d;
+    }
+
+    .atalho span {
+        font-size: 13px;
+        color: #58665c;
+    }
+</style>
+
+{% endblock %}
