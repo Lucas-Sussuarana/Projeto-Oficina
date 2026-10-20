@@ -1,45 +1,77 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Serviços</title>
-</head>
-<body>
 
-<h1>Serviços cadastrados</h1>
+{% extends "base.html" %}
 
-<a href="{% url 'criar_servico' %}">
-    Novo serviço
-</a>
+{% block title %}Serviços | TESI Oficina{% endblock %}
 
-<br><br>
+{% block breadcrumb %}Cadastros / Serviços{% endblock %}
 
-{% for servico in servicos %}
+{% block content %}
 
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
     <div>
-        <strong>{{ servico.nome }}</strong>
-        <br>
-        <a href="{% url 'editar_servico' servico.id %}">
-            Editar
-        </a>
-        Descrição: {{ servico.descricao }}
-        <br>
-        Preço: R$ {{ servico.preco }}
-        <br>
-        Status:
-        {% if servico.ativo %}
-            Ativo
-        {% else %}
-            Inativo
-        {% endif %}
+        <h2>Serviços cadastrados</h2>
+        <p class="text-muted mb-0">
+            Consulte os serviços oferecidos pela oficina.
+        </p>
     </div>
 
-    <hr>
+    <a href="{% url 'criar_servico' %}" class="btn btn-success">
+        + Novo serviço
+    </a>
+</div>
 
-{% empty %}
+<div class="row g-3">
 
-    <p>Nenhum serviço cadastrado.</p>
+    {% for servico in servicos %}
 
-{% endfor %}
+    <div class="col-12 col-md-6 col-xl-4">
+        <div class="card h-100 shadow-sm">
 
-</body>
-</html>
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center gap-2">
+                <strong>{{ servico.nome }}</strong>
+
+                {% if servico.ativo %}
+                    <span class="badge bg-success">Ativo</span>
+                {% else %}
+                    <span class="badge bg-secondary">Inativo</span>
+                {% endif %}
+            </div>
+
+            <div class="card-body">
+
+                <p class="text-muted mb-3">
+                    {{ servico.descricao|default:"Sem descrição cadastrada." }}
+                </p>
+
+                <hr>
+
+                <p class="mb-0">
+                    <strong>Preço:</strong>
+                    R$ {{ servico.preco|floatformat:2 }}
+                </p>
+
+            </div>
+
+            <div class="card-footer bg-white">
+                <a href="{% url 'editar_servico' servico.id %}"
+                   class="btn btn-outline-success btn-sm">
+                    Editar serviço
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    {% empty %}
+
+    <div class="col-12">
+        <div class="alert alert-secondary">
+            Nenhum serviço cadastrado.
+        </div>
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

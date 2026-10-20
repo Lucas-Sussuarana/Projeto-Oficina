@@ -1,63 +1,102 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Peças</title>
-</head>
-<body>
 
-<h1>Peças cadastradas</h1>
+{% extends "base.html" %}
 
-<a href="{% url 'criar_peca' %}">
-    Nova peça
-</a>
+{% block title %}Peças | TESI Oficina{% endblock %}
 
-<br><br>
+{% block breadcrumb %}Cadastros / Peças{% endblock %}
 
-{% for peca in pecas %}
+{% block content %}
 
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
     <div>
-        <strong>{{ peca.nome }}</strong>
-
-        <br>
-        <a href="{% url 'editar_peca' peca.id %}">
-            Editar
-        </a>
-
-        <a href="{% url 'entrada_estoque' peca.id %}">
-            Entrada de estoque
-        </a>
-
-        Descrição: {{ peca.descricao }}
-
-        <br>
-
-        Preço: R$ {{ peca.preco }}
-
-        <br>
-
-        Estoque atual: {{ peca.estoque }}
-
-        <br>
-
-        Estoque mínimo: {{ peca.estoque_minimo }}
-
-        <br>
-
-        Status:
-        {% if peca.ativo %}
-            Ativo
-        {% else %}
-            Inativo
-        {% endif %}
+        <h2>Peças cadastradas</h2>
+        <p class="text-muted mb-0">
+            Consulte o catálogo e acompanhe o estoque da oficina.
+        </p>
     </div>
 
-    <hr>
+    <a href="{% url 'criar_peca' %}" class="btn btn-success">
+        + Nova peça
+    </a>
+</div>
 
-{% empty %}
+<div class="row g-3">
 
-    <p>Nenhuma peça cadastrada.</p>
+    {% for peca in pecas %}
 
-{% endfor %}
+    <div class="col-12 col-md-6 col-xl-4">
+        <div class="card h-100 shadow-sm">
 
-</body>
-</html>
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center gap-2">
+                <strong>{{ peca.nome }}</strong>
+
+                {% if peca.ativo %}
+                    <span class="badge bg-success">Ativo</span>
+                {% else %}
+                    <span class="badge bg-secondary">Inativo</span>
+                {% endif %}
+            </div>
+
+            <div class="card-body">
+
+                <p class="text-muted mb-3">
+                    {{ peca.descricao|default:"Sem descrição cadastrada." }}
+                </p>
+
+                <hr>
+
+                <p class="mb-2">
+                    <strong>Preço:</strong>
+                    R$ {{ peca.preco|floatformat:2 }}
+                </p>
+
+                <p class="mb-2">
+                    <strong>Estoque atual:</strong>
+                    {{ peca.estoque }}
+                </p>
+
+                <p class="mb-0">
+                    <strong>Estoque mínimo:</strong>
+                    {{ peca.estoque_minimo }}
+                </p>
+
+                {% if peca.estoque <= peca.estoque_minimo %}
+                    <div class="alert alert-warning mt-3 mb-0 py-2">
+                        Atenção: estoque no limite ou abaixo do mínimo.
+                    </div>
+                {% endif %}
+
+            </div>
+
+            <div class="card-footer bg-white">
+                <div class="d-flex flex-wrap gap-2">
+
+                    <a href="{% url 'editar_peca' peca.id %}"
+                       class="btn btn-outline-success btn-sm">
+                        Editar
+                    </a>
+
+                    <a href="{% url 'entrada_estoque' peca.id %}"
+                       class="btn btn-success btn-sm">
+                        Entrada de estoque
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {% empty %}
+
+    <div class="col-12">
+        <div class="alert alert-secondary">
+            Nenhuma peça cadastrada.
+        </div>
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}
