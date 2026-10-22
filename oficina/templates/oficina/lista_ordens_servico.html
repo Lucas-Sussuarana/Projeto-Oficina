@@ -1,55 +1,86 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Ordens de Serviço</title>
-</head>
-<body>
 
-<h1>Ordens de Serviço</h1>
+{% extends "base.html" %}
 
-{% if ordens %}
+{% block title %}Ordens de Serviço | TESI Oficina{% endblock %}
 
-    {% for ordem in ordens %}
+{% block breadcrumb %}Oficina / Ordens de Serviço{% endblock %}
 
-        <div>
-            <strong>
-                <a href="{% url 'detalhe_ordem_servico' ordem.numero %}">
-                    OS nº {{ ordem.numero }}
-                </a>
-            </strong>
-            <br>
+{% block content %}
 
-            Cliente:
-            {{ ordem.cliente.nome }}
+<div class="mb-4">
+    <h2>Ordens de Serviço</h2>
+    <p class="text-muted mb-0">
+        Ordens abertas e em atendimento na oficina.
+    </p>
+</div>
 
-            <br>
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
 
-            Veículo:
-            {{ ordem.veiculo.modelo }} -
-            {{ ordem.veiculo.placa }}
+        <thead class="table-dark">
+            <tr>
+                <th>Número</th>
+                <th>Cliente</th>
+                <th>Veículo</th>
+                <th>Status</th>
+                <th>Solicitação</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
 
-            <br>
+        <tbody>
+            {% for ordem in ordens %}
+            <tr>
+                <td>
+                    <strong>OS nº {{ ordem.numero }}</strong>
+                </td>
 
-            Status:
-            {{ ordem.get_status_display }}
+                <td>{{ ordem.cliente.nome }}</td>
 
-            <br>
+                <td>
+                    {{ ordem.veiculo.modelo }}
+                    <br>
+                    <small class="text-muted">
+                        {{ ordem.veiculo.placa }}
+                    </small>
+                </td>
 
-            Solicitação:
-            {{ ordem.solicitacao_cliente }}
+                <td>
+                    {% if ordem.status == "ABERTA" %}
+                        <span class="badge bg-primary">
+                            {{ ordem.get_status_display }}
+                        </span>
+                    {% elif ordem.status == "EM_ATENDIMENTO" %}
+                        <span class="badge bg-warning text-dark">
+                            {{ ordem.get_status_display }}
+                        </span>
+                    {% else %}
+                        <span class="badge bg-secondary">
+                            {{ ordem.get_status_display }}
+                        </span>
+                    {% endif %}
+                </td>
 
-            <br><br>
-        </div>
+                <td>{{ ordem.solicitacao_cliente|truncatechars:80 }}</td>
 
-        <hr>
+                <td>
+                    <a href="{% url 'detalhe_ordem_servico' ordem.numero %}"
+                       class="btn btn-success btn-sm">
+                        Abrir OS
+                    </a>
+                </td>
+            </tr>
 
-    {% endfor %}
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center text-muted py-4">
+                    Não há Ordens de Serviço disponíveis.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
 
-{% else %}
+    </table>
+</div>
 
-    <p>Não há Ordens de Serviço disponíveis.</p>
-
-{% endif %}
-
-</body>
-</html>
+{% endblock %}
