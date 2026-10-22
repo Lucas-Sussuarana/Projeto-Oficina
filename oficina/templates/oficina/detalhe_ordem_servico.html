@@ -1,418 +1,509 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Ordem de Serviço</title>
-</head>
-<body>
 
+{% extends "base.html" %}
+
+{% block title %}OS nº {{ ordem.numero }} | TESI Oficina{% endblock %}
+
+{% block breadcrumb %}Oficina / OS nº {{ ordem.numero }}{% endblock %}
+
+{% block content %}
+
+<!-- CABEÇALHO DA ORDEM -->
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2>Ordem de Serviço nº {{ ordem.numero }}</h2>
+        <p class="text-muted mb-0">
+            Detalhes, execução e acompanhamento do serviço.
+        </p>
+    </div>
+
+    <div>
+        {% if ordem.status == 'ABERTA' %}
+            <span class="badge bg-primary fs-6">Aberta</span>
+        {% elif ordem.status == 'EM_ATENDIMENTO' %}
+            <span class="badge bg-warning text-dark fs-6">Em atendimento</span>
+        {% elif ordem.status == 'PRONTO' %}
+            <span class="badge bg-success fs-6">Pronta para entrega</span>
+        {% elif ordem.status == 'ENTREGUE' %}
+            <span class="badge bg-secondary fs-6">Entregue</span>
+        {% elif ordem.status == 'CANCELADA' %}
+            <span class="badge bg-danger fs-6">Cancelada</span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- INICIAR ATENDIMENTO -->
 {% if ordem.status == 'ABERTA' or ordem.status == 'EM_ATENDIMENTO' %}
     {% if not participacao_aberta %}
+        <div class="alert alert-info d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <span>Esta OS ainda não possui um atendimento iniciado por você.</span>
 
-    <form method="post" action="{% url 'iniciar_atendimento' ordem.numero %}">
-        {% csrf_token %}
-
-        <button type="submit">
-            Iniciar atendimento
-        </button>
-    </form>
-
+            <form method="post" action="{% url 'iniciar_atendimento' ordem.numero %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">
+                    Iniciar atendimento
+                </button>
+            </form>
+        </div>
     {% endif %}
 {% endif %}
 
-<h1>Ordem de Serviço nº {{ ordem.numero }}</h1>
+<!-- CLIENTE -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white">
+        <strong>Dados do cliente</strong>
+    </div>
 
-<h2>Cliente</h2>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-12 col-md-6">
+                <strong>Nome</strong>
+                <div>{{ ordem.cliente.nome }}</div>
+            </div>
 
-<p>
-    Nome: {{ ordem.cliente.nome }}
-</p>
+            <div class="col-12 col-md-6">
+                <strong>CPF/CNPJ</strong>
+                <div>{{ ordem.cliente.cpf_cnpj|default:"—" }}</div>
+            </div>
 
-<p>
-    CPF/CNPJ: {{ ordem.cliente.cpf_cnpj }}
-</p>
+            <div class="col-12 col-md-6">
+                <strong>Telefone</strong>
+                <div>{{ ordem.cliente.telefone|default:"—" }}</div>
+            </div>
 
-<p>
-    Telefone: {{ ordem.cliente.telefone }}
-</p>
+            <div class="col-12 col-md-6">
+                <strong>Celular</strong>
+                <div>{{ ordem.cliente.celular|default:"—" }}</div>
+            </div>
+        </div>
+    </div>
+</div>
 
-<p>
-    Celular: {{ ordem.cliente.celular }}
-</p>
+<!-- VEÍCULO -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white">
+        <strong>Dados do veículo</strong>
+    </div>
 
-<h2>Veículo</h2>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-6 col-md-4">
+                <strong>Tipo</strong>
+                <div>{{ ordem.veiculo.tipo }}</div>
+            </div>
 
-<p>
-    Tipo: {{ ordem.veiculo.tipo }}
-</p>
+            <div class="col-6 col-md-4">
+                <strong>Marca</strong>
+                <div>{{ ordem.veiculo.marca }}</div>
+            </div>
 
-<p>
-    Marca: {{ ordem.veiculo.marca }}
-</p>
+            <div class="col-12 col-md-4">
+                <strong>Modelo</strong>
+                <div>{{ ordem.veiculo.modelo }}</div>
+            </div>
 
-<p>
-    Modelo: {{ ordem.veiculo.modelo }}
-</p>
+            <div class="col-6 col-md-3">
+                <strong>Ano</strong>
+                <div>{{ ordem.veiculo.ano }}</div>
+            </div>
 
-<p>
-    Ano: {{ ordem.veiculo.ano }}
-</p>
+            <div class="col-6 col-md-3">
+                <strong>Cor</strong>
+                <div>{{ ordem.veiculo.cor }}</div>
+            </div>
 
-<p>
-    Cor: {{ ordem.veiculo.cor }}
-</p>
+            <div class="col-6 col-md-3">
+                <strong>Placa</strong>
+                <div>{{ ordem.veiculo.placa }}</div>
+            </div>
 
-<p>
-    Placa: {{ ordem.veiculo.placa }}
-</p>
+            <div class="col-6 col-md-3">
+                <strong>Combustível</strong>
+                <div>{{ ordem.veiculo.combustivel }}</div>
+            </div>
+        </div>
+    </div>
+</div>
 
-<p>
-    Combustível: {{ ordem.veiculo.combustivel }}
-</p>
+<!-- SOLICITAÇÃO -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white">
+        <strong>Solicitação do cliente</strong>
+    </div>
 
-<h2>Solicitação do cliente</h2>
+    <div class="card-body">
+        {{ ordem.solicitacao_cliente|linebreaksbr }}
+    </div>
+</div>
 
-<p>
-    {{ ordem.solicitacao_cliente }}
-</p>
-
-<h2>Status</h2>
+<!-- CANCELAMENTO -->
 {% if ordem.status == 'CANCELADA' %}
-    <h2>Cancelamento da OS</h2>
-
-    <p>
-        <strong>Motivo:</strong>
-        {{ ordem.motivo_cancelamento|default:"Motivo não informado." }}
-    </p>
-{% endif %}
-<h2>Serviços realizados</h2>
-
-{% if ordem.itens_servico.all %}
-
-    {% for item in ordem.itens_servico.all %}
-
-        <p>
-            Serviço: {{ item.servico.nome }}
-            <br>
-            Quantidade: {{ item.quantidade }}
-            <br>
-            Preço unitário: R$ {{ item.preco_unitario }}
-            <br>
-            Subtotal: R$ {{ item.subtotal }}
-        </p>
-
-        <hr>
-
-    {% empty %}
-
-        <p>Nenhum serviço adicionado.</p>
-
-    {% endfor %}
-
-{% else %}
-
-    <p>Nenhum serviço adicionado.</p>
-
+<div class="alert alert-danger mb-4">
+    <h5>Cancelamento da OS</h5>
+    <strong>Motivo:</strong>
+    {{ ordem.motivo_cancelamento|default:"Motivo não informado." }}
+</div>
 {% endif %}
 
-<h2>Peças utilizadas</h2>
+<!-- SERVIÇOS -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white">
+        <strong>Serviços realizados</strong>
+    </div>
 
-{% for item in ordem.itens_peca.all %}
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Serviço</th>
+                        <th>Quantidade</th>
+                        <th>Preço unitário</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
 
-    <p>
-        Peça: {{ item.peca.nome }}
-        <br>
-        Quantidade: {{ item.quantidade }}
-        <br>
-        Preço unitário: R$ {{ item.preco_unitario }}
-        <br>
-        Subtotal: R$ {{ item.subtotal }}
-    </p>
+                <tbody>
+                    {% for item in ordem.itens_servico.all %}
+                    <tr>
+                        <td>{{ item.servico.nome }}</td>
+                        <td>{{ item.quantidade }}</td>
+                        <td>R$ {{ item.preco_unitario|floatformat:2 }}</td>
+                        <td>R$ {{ item.subtotal|floatformat:2 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">
+                            Nenhum serviço adicionado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-    <hr>
+<!-- PEÇAS -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white">
+        <strong>Peças utilizadas</strong>
+    </div>
 
-{% empty %}
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Peça</th>
+                        <th>Quantidade</th>
+                        <th>Preço unitário</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
 
-    <p>Nenhuma peça adicionada.</p>
+                <tbody>
+                    {% for item in ordem.itens_peca.all %}
+                    <tr>
+                        <td>{{ item.peca.nome }}</td>
+                        <td>{{ item.quantidade }}</td>
+                        <td>R$ {{ item.preco_unitario|floatformat:2 }}</td>
+                        <td>R$ {{ item.subtotal|floatformat:2 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">
+                            Nenhuma peça adicionada.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-{% endfor %}
-
+<!-- ADICIONAR PEÇA -->
 {% if ordem.status == 'EM_ATENDIMENTO' %}
-
-<h2>Adicionar peça</h2>
-
-<form method="post" action="{% url 'adicionar_peca' ordem.numero %}">
-    {% csrf_token %}
-
-    <label for="peca">
-        Peça:
-    </label>
-
-    <select name="peca" id="peca" required>
-        <option value="">
-            ---------
-        </option>
-
-        {% for peca in pecas %}
-            <option value="{{ peca.id }}">
-                {{ peca.nome }} - R$ {{ peca.preco }}
-                (Estoque: {{ peca.estoque }})
-            </option>
-        {% endfor %}
-    </select>
-
-    <br><br>
-
-    <label for="quantidade_peca">
-        Quantidade:
-    </label>
-
-    <input
-        type="number"
-        name="quantidade"
-        id="quantidade_peca"
-        value="1"
-        min="0.01"
-        step="0.01"
-        required
-    >
-
-    <br><br>
-
-    <button type="submit">
-        Adicionar peça
-    </button>
-</form>
-
-{% endif %}
-
-{% if ordem.status == 'EM_ATENDIMENTO' %}
-
-<h2>Nova observação</h2>
-
-<form method="post" action="{% url 'adicionar_observacao' ordem.numero %}">
-    {% csrf_token %}
-
-    <textarea
-        name="texto"
-        rows="5"
-        cols="60"
-        required
-    ></textarea>
-
-    <br><br>
-
-    <button type="submit">
-        Registrar observação
-    </button>
-</form>
-
-{% endif %}
-
-<h2>Observações</h2>
-
-{% for observacao in ordem.observacoes.all %}
-
-    <p>
-        <strong>{{ observacao.autor.username }}</strong>
-        -
-        {{ observacao.data }}
-    </p>
-
-    <p>
-        {{ observacao.texto }}
-    </p>
-
-    <hr>
-
-{% empty %}
-
-    <p>Nenhuma observação registrada.</p>
-
-{% endfor %}
-
-<p>
-    <strong>
-        Valor total da OS: R$ {{ ordem.valor_total }}
-    </strong>
-</p>
-
-<p>
-    {{ ordem.get_status_display }}
-</p>
-    {% if ordem.status == 'EM_ATENDIMENTO' %}
-
-    <h2>Adicionar serviço</h2>
-
-    <form method="post" action="{% url 'adicionar_servico' ordem.numero %}">
-        {% csrf_token %}
-
-        <label for="servico">
-            Serviço:
-        </label>
-
-        <select name="servico" id="servico" required>
-            <option value="">
-                ---------
-            </option>
-
-            {% for servico in servicos %}
-                <option value="{{ servico.id }}">
-                    {{ servico.nome }} - R$ {{ servico.preco }}
-                </option>
-            {% endfor %}
-        </select>
-
-        <br><br>
-
-        <label for="quantidade">
-            Quantidade:
-        </label>
-
-        <input
-            type="number"
-            name="quantidade"
-            id="quantidade"
-            value="1"
-            min="0.01"
-            step="0.01"
-            required
-        >
-
-        <br><br>
-
-        <button type="submit">
-            Adicionar serviço
-        </button>
-    </form>
-
-    {% endif %}
-
-{% if ordem.status == 'EM_ATENDIMENTO' %}
-
-<h2>Finalizar atendimento</h2>
-
-<form method="post" action="{% url 'finalizar_ordem_servico' ordem.numero %}">
-    {% csrf_token %}
-
-    <label for="demanda_atendida">
-        A solicitação do cliente foi atendida?
-    </label>
-
-    <select
-        name="demanda_atendida"
-        id="demanda_atendida"
-        required
-    >
-        <option value="">
-            ---------
-        </option>
-
-        <option value="SIM">
-            Sim
-        </option>
-
-        <option value="NAO">
-            Não
-        </option>
-    </select>
-
-    <br><br>
-
-    <label for="motivo_nao_atendida">
-        Motivo caso não tenha sido atendida:
-    </label>
-
-    <br>
-
-    <textarea
-        name="motivo_nao_atendida"
-        id="motivo_nao_atendida"
-        rows="4"
-        cols="60"
-    ></textarea>
-
-    <script>
-        const demandaAtendida = document.getElementById('demanda_atendida');
-        const motivoNaoAtendida = document.getElementById('motivo_nao_atendida');
-
-        function atualizarMotivo() {
-            if (demandaAtendida.value === 'NAO') {
-                motivoNaoAtendida.required = true;
-            } else {
-                motivoNaoAtendida.required = false;
-            }
-        }
-
-        demandaAtendida.addEventListener('change', atualizarMotivo);
-        atualizarMotivo();
-    </script>
-
-    <br><br>
-
-    <label for="observacao_final">
-        Observação final:
-    </label>
-
-    <br>
-
-    <textarea
-        name="observacao_final"
-        id="observacao_final"
-        rows="4"
-        cols="60"
-    ></textarea>
-
-    <br><br>
-
-    <button type="submit">
-        Marcar como pronto
-    </button>
-
-</form>
-
-{% endif %}
-
-{% if ordem.status == 'PRONTO' %}
-
-<h2>Entrega da OS</h2>
-
-<form method="post" action="{% url 'entregar_ordem_servico' ordem.numero %}">
-    {% csrf_token %}
-
-    <button type="submit">
-        Marcar como entregue
-    </button>
-</form>
-
-{% endif %}
-
-{% if ordem.status == 'ABERTA' or ordem.status == 'EM_ATENDIMENTO' %}
-    {% if pode_cancelar %}
-        <h2>Cancelar Ordem de Serviço</h2>
-
-        <form method="post" action="{% url 'cancelar_ordem_servico' ordem.numero %}">
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-success text-white">
+        <strong>Adicionar peça</strong>
+    </div>
+
+    <div class="card-body">
+        <form method="post" action="{% url 'adicionar_peca' ordem.numero %}">
             {% csrf_token %}
 
-            <label for="motivo_cancelamento">
-                Motivo do cancelamento:
+            <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-8">
+                    <label for="peca" class="form-label">Peça</label>
+                    <select name="peca" id="peca" class="form-select" required>
+                        <option value="">Selecione uma peça</option>
+
+                        {% for peca in pecas %}
+                        <option value="{{ peca.id }}">
+                            {{ peca.nome }} - R$ {{ peca.preco|floatformat:2 }}
+                            (Estoque: {{ peca.estoque }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-2">
+                    <label for="quantidade_peca" class="form-label">
+                        Quantidade
+                    </label>
+                    <input type="number"
+                           name="quantidade"
+                           id="quantidade_peca"
+                           class="form-control"
+                           value="1"
+                           min="0.01"
+                           step="0.01"
+                           required>
+                </div>
+
+                <div class="col-12 col-md-2">
+                    <button type="submit" class="btn btn-success w-100">
+                        Adicionar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<!-- ADICIONAR SERVIÇO -->
+{% if ordem.status == 'EM_ATENDIMENTO' %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-success text-white">
+        <strong>Adicionar serviço</strong>
+    </div>
+
+    <div class="card-body">
+        <form method="post" action="{% url 'adicionar_servico' ordem.numero %}">
+            {% csrf_token %}
+
+            <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-8">
+                    <label for="servico" class="form-label">Serviço</label>
+                    <select name="servico" id="servico" class="form-select" required>
+                        <option value="">Selecione um serviço</option>
+
+                        {% for servico in servicos %}
+                        <option value="{{ servico.id }}">
+                            {{ servico.nome }} - R$ {{ servico.preco|floatformat:2 }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-2">
+                    <label for="quantidade" class="form-label">Quantidade</label>
+                    <input type="number"
+                           name="quantidade"
+                           id="quantidade"
+                           class="form-control"
+                           value="1"
+                           min="0.01"
+                           step="0.01"
+                           required>
+                </div>
+
+                <div class="col-12 col-md-2">
+                    <button type="submit" class="btn btn-success w-100">
+                        Adicionar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<!-- NOVA OBSERVAÇÃO -->
+{% if ordem.status == 'EM_ATENDIMENTO' %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white">
+        <strong>Nova observação</strong>
+    </div>
+
+    <div class="card-body">
+        <form method="post" action="{% url 'adicionar_observacao' ordem.numero %}">
+            {% csrf_token %}
+
+            <label for="texto" class="form-label">
+                Descreva a observação
             </label>
-            <br>
 
-            <textarea
-                name="motivo_cancelamento"
-                id="motivo_cancelamento"
-                rows="4"
-                cols="60"
-                required
-            ></textarea>
+            <textarea name="texto"
+                      id="texto"
+                      class="form-control mb-3"
+                      rows="4"
+                      required></textarea>
 
-            <br><br>
-
-            <button type="submit">
-                Cancelar OS
+            <button type="submit" class="btn btn-success">
+                Registrar observação
             </button>
         </form>
+    </div>
+</div>
+{% endif %}
+
+<!-- HISTÓRICO DE OBSERVAÇÕES -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white">
+        <strong>Observações registradas</strong>
+    </div>
+
+    <div class="card-body">
+        {% for observacao in ordem.observacoes.all %}
+        <div class="border-bottom pb-3 mb-3">
+            <div class="text-muted small mb-2">
+                <strong>{{ observacao.autor.username }}</strong>
+                — {{ observacao.data|date:"d/m/Y H:i" }}
+            </div>
+
+            <div>{{ observacao.texto|linebreaksbr }}</div>
+        </div>
+        {% empty %}
+        <p class="text-muted mb-0">Nenhuma observação registrada.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- VALOR TOTAL -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <strong class="fs-5">Valor total da OS</strong>
+        <span class="fs-4 fw-bold text-success">
+            R$ {{ ordem.valor_total|floatformat:2 }}
+        </span>
+    </div>
+</div>
+
+<!-- FINALIZAR ATENDIMENTO -->
+{% if ordem.status == 'EM_ATENDIMENTO' %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-success text-white">
+        <strong>Finalizar atendimento</strong>
+    </div>
+
+    <div class="card-body">
+        <form method="post" action="{% url 'finalizar_ordem_servico' ordem.numero %}">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="demanda_atendida" class="form-label">
+                    A solicitação do cliente foi atendida?
+                </label>
+
+                <select name="demanda_atendida"
+                        id="demanda_atendida"
+                        class="form-select"
+                        required>
+                    <option value="">Selecione uma opção</option>
+                    <option value="SIM">Sim</option>
+                    <option value="NAO">Não</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="motivo_nao_atendida" class="form-label">
+                    Motivo caso não tenha sido atendida
+                </label>
+
+                <textarea name="motivo_nao_atendida"
+                          id="motivo_nao_atendida"
+                          class="form-control"
+                          rows="3"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="observacao_final" class="form-label">
+                    Observação final
+                </label>
+
+                <textarea name="observacao_final"
+                          id="observacao_final"
+                          class="form-control"
+                          rows="3"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                Marcar como pronto
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const demandaAtendida = document.getElementById('demanda_atendida');
+    const motivoNaoAtendida = document.getElementById('motivo_nao_atendida');
+
+    function atualizarMotivo() {
+        motivoNaoAtendida.required = demandaAtendida.value === 'NAO';
+    }
+
+    demandaAtendida.addEventListener('change', atualizarMotivo);
+    atualizarMotivo();
+</script>
+{% endif %}
+
+<!-- ENTREGA -->
+{% if ordem.status == 'PRONTO' %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-success text-white">
+        <strong>Entrega da OS</strong>
+    </div>
+
+    <div class="card-body">
+        <p>Confirme a entrega do veículo ao cliente.</p>
+
+        <form method="post" action="{% url 'entregar_ordem_servico' ordem.numero %}">
+            {% csrf_token %}
+
+            <button type="submit" class="btn btn-success">
+                Marcar como entregue
+            </button>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<!-- CANCELAR OS -->
+{% if ordem.status == 'ABERTA' or ordem.status == 'EM_ATENDIMENTO' %}
+    {% if pode_cancelar %}
+    <div class="card border-danger shadow-sm mb-4">
+        <div class="card-header bg-danger text-white">
+            <strong>Cancelar Ordem de Serviço</strong>
+        </div>
+
+        <div class="card-body">
+            <p class="text-muted">
+                Informe o motivo antes de cancelar esta ordem.
+            </p>
+
+            <form method="post" action="{% url 'cancelar_ordem_servico' ordem.numero %}">
+                {% csrf_token %}
+
+                <label for="motivo_cancelamento" class="form-label">
+                    Motivo do cancelamento
+                </label>
+
+                <textarea name="motivo_cancelamento"
+                          id="motivo_cancelamento"
+                          class="form-control mb-3"
+                          rows="4"
+                          required></textarea>
+
+                <button type="submit" class="btn btn-danger">
+                    Cancelar OS
+                </button>
+            </form>
+        </div>
+    </div>
     {% endif %}
 {% endif %}
-</body>
-</html>
+
+{% endblock %}
