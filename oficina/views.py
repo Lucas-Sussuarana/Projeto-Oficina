@@ -462,14 +462,6 @@ def lista_ordens_servico(request):
         {'ordens': ordens}
     )
 
-@user_passes_test(
-    lambda user: (
-        user.is_superuser
-        or user.groups.filter(
-            name__in=['Mecânicos', 'Recepcionistas']
-        ).exists()
-    )
-)
 
 @user_passes_test(
     lambda user:  user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
