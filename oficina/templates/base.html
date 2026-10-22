@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>{% block title %}TESI Oficina{% endblock %}</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
@@ -22,12 +23,12 @@
 
         /* CABEÇALHO SUPERIOR */
         .top-header {
-            height: 76px;
+            min-height: 76px;
             background-color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 28px;
+            padding: 12px 28px;
             border-bottom: 1px solid #dddddd;
         }
 
@@ -71,23 +72,112 @@
             gap: 5px;
             padding: 5px 15px;
             flex-wrap: wrap;
+            position: relative;
+            z-index: 1000;
         }
 
-        .main-nav a {
+        .nav-item-custom {
+            position: relative;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .main-nav a,
+        .nav-trigger {
             color: #ffffff;
             text-decoration: none;
+            font-family: inherit;
             font-weight: bold;
             font-size: 14px;
             padding: 13px 18px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            border: none;
+            background: transparent;
             border-radius: 4px;
+            cursor: pointer;
+            white-space: nowrap;
             transition: background-color 0.2s;
         }
 
         .main-nav a:hover,
-        .main-nav a:focus {
+        .main-nav a:focus,
+        .nav-trigger:hover,
+        .nav-trigger:focus,
+        .nav-item-custom.open > .nav-trigger {
             background-color: #276749;
+            color: #ffffff;
+        }
+
+        .nav-arrow {
+            font-size: 10px;
+            transition: transform 0.2s;
+        }
+
+        .nav-item-custom.open .nav-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* SUBMENUS */
+        .submenu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 220px;
+            padding: 6px 0;
+            margin: 0;
+            list-style: none;
+            background-color: #ffffff;
+            border: 1px solid #d9e2dc;
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.18);
+        }
+
+        .nav-item-custom.open > .submenu {
+            display: block;
+        }
+
+        .submenu li {
+            display: block;
+            width: 100%;
+        }
+
+        .main-nav .submenu a {
+            display: block;
+            width: 100%;
+            padding: 11px 16px;
+            color: #244b34;
+            background-color: #ffffff;
+            font-size: 13px;
+            font-weight: normal;
+            white-space: nowrap;
+            border-radius: 0;
+        }
+
+        .main-nav .submenu a:hover,
+        .main-nav .submenu a:focus {
+            color: #14532d;
+            background-color: #e8f2eb;
+        }
+
+        .submenu-divider {
+            height: 1px;
+            margin: 5px 0;
+            background-color: #e3e8e4;
+        }
+
+        /* ABRIR COM MOUSE NO COMPUTADOR */
+        @media (hover: hover) and (pointer: fine) {
+            .nav-item-custom:hover > .submenu {
+                display: block;
+            }
+
+            .nav-item-custom:hover > .nav-trigger .nav-arrow {
+                transform: rotate(180deg);
+            }
         }
 
         /* ÁREA CENTRAL */
@@ -126,15 +216,21 @@
             line-height: 1.8;
         }
 
-        /* ADAPTAÇÃO PARA TELAS MENORES */
+        /* TELAS MENORES */
         @media (max-width: 600px) {
             .top-header {
-                padding: 0 12px;
-                height: 68px;
+                padding: 12px;
+                min-height: 68px;
             }
 
             .brand-name {
                 font-size: 19px;
+            }
+
+            .brand-icon {
+                width: 38px;
+                height: 38px;
+                font-size: 21px;
             }
 
             .user-info {
@@ -143,11 +239,22 @@
 
             .main-nav {
                 padding: 5px;
+                gap: 3px;
             }
 
-            .main-nav a {
+            .main-nav > .nav-item-custom > a,
+            .nav-trigger {
                 padding: 10px;
                 font-size: 12px;
+            }
+
+            .submenu {
+                min-width: 205px;
+            }
+
+            .main-nav .submenu a {
+                padding: 11px 13px;
+                font-size: 13px;
             }
 
             .page-background {
@@ -177,13 +284,82 @@
     </header>
 
     <!-- MENU DE NAVEGAÇÃO -->
-    <nav class="main-nav">
-        <a href="/">Início</a>
-        <a href="/clientes/">Clientes</a>
-        <a href="/veiculos/">Veículos</a>
-        <a href="/pecas/">Peças</a>
-        <a href="/servicos/">Serviços</a>
-        <a href="/ordens/">Ordens de Serviço</a>
+    <nav class="main-nav" aria-label="Menu principal">
+
+        <!-- INÍCIO -->
+        <div class="nav-item-custom">
+            <a href="/">Início</a>
+        </div>
+
+        <!-- CLIENTES -->
+        <div class="nav-item-custom">
+            <button type="button" class="nav-trigger"
+                    aria-expanded="false" onclick="toggleMenu(this)">
+                Clientes <span class="nav-arrow">▼</span>
+            </button>
+
+            <ul class="submenu">
+                <li><a href="/clientes/">Listar clientes</a></li>
+                <li><a href="{% url 'criar_cliente' %}">Cadastrar cliente</a></li>
+            </ul>
+        </div>
+
+        <!-- VEÍCULOS -->
+        <div class="nav-item-custom">
+            <button type="button" class="nav-trigger"
+                    aria-expanded="false" onclick="toggleMenu(this)">
+                Veículos <span class="nav-arrow">▼</span>
+            </button>
+
+            <ul class="submenu">
+                <li><a href="/veiculos/">Listar veículos</a></li>
+                <li><a href="{% url 'criar_veiculo' %}">Cadastrar veículo</a></li>
+            </ul>
+        </div>
+
+        <!-- PEÇAS -->
+        <div class="nav-item-custom">
+            <button type="button" class="nav-trigger"
+                    aria-expanded="false" onclick="toggleMenu(this)">
+                Peças <span class="nav-arrow">▼</span>
+            </button>
+
+            <ul class="submenu">
+                <li><a href="/pecas/">Listar peças</a></li>
+                <li><a href="{% url 'criar_peca' %}">Cadastrar peça</a></li>
+
+            </ul>
+        </div>
+
+        <!-- SERVIÇOS -->
+        <div class="nav-item-custom">
+            <button type="button" class="nav-trigger"
+                    aria-expanded="false" onclick="toggleMenu(this)">
+                Serviços <span class="nav-arrow">▼</span>
+            </button>
+
+            <ul class="submenu">
+                <li><a href="/servicos/">Listar serviços</a></li>
+                <li><a href="{% url 'criar_servico' %}">Cadastrar serviço</a></li>
+            </ul>
+        </div>
+
+        <!-- ORDENS DE SERVIÇO -->
+        <div class="nav-item-custom">
+            <button type="button" class="nav-trigger"
+                    aria-expanded="false" onclick="toggleMenu(this)">
+                Ordens de Serviço <span class="nav-arrow">▼</span>
+            </button>
+
+            <ul class="submenu">
+                <li><a href="/ordens/">Todas as ordens</a></li>
+                <li><a href="/ordens/">Ordens abertas e em atendimento</a></li>
+                <li><a href="/ordens/prontas/">Ordens prontas</a></li>
+                <li><a href="/ordens/entregues/">Ordens entregues</a></li>
+                <li><a href="/ordens/canceladas/">Ordens canceladas</a></li>
+            </ul>
+        </div>
+
     </nav>
 
     <!-- CONTEÚDO VARIÁVEL -->
@@ -203,6 +379,50 @@
         TESI Oficina — Sistema de Gestão<br>
         Todos os direitos reservados.
     </footer>
+
+    <script>
+        function toggleMenu(button) {
+            const item = button.closest('.nav-item-custom');
+            const isOpen = item.classList.contains('open');
+
+            document.querySelectorAll('.nav-item-custom.open').forEach(menu => {
+                menu.classList.remove('open');
+                const trigger = menu.querySelector('.nav-trigger');
+                if (trigger) {
+                    trigger.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            if (!isOpen) {
+                item.classList.add('open');
+                button.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.nav-item-custom')) {
+                document.querySelectorAll('.nav-item-custom.open').forEach(menu => {
+                    menu.classList.remove('open');
+                    const trigger = menu.querySelector('.nav-trigger');
+                    if (trigger) {
+                        trigger.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                document.querySelectorAll('.nav-item-custom.open').forEach(menu => {
+                    menu.classList.remove('open');
+                    const trigger = menu.querySelector('.nav-trigger');
+                    if (trigger) {
+                        trigger.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+        });
+    </script>
 
 </body>
 </html>
