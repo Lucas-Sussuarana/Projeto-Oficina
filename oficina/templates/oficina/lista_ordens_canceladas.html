@@ -1,37 +1,74 @@
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Ordens de Serviço Canceladas</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h1>Ordens de Serviço Canceladas</h1>
+{% block title %}Ordens Canceladas | TESI Oficina{% endblock %}
 
-{% for ordem in ordens %}
-    <div>
-        <strong>OS #{{ ordem.numero }}</strong>
-        <br>
-        Cliente: {{ ordem.cliente.nome }}
-        <br>
-        Veículo: {{ ordem.veiculo.modelo }} - {{ ordem.veiculo.placa }}
-        <br>
-        Data de cancelamento: {{ ordem.data_atualizacao }}
-        <br>
-        Motivo do cancelamento:
-        {{ ordem.motivo_cancelamento|default:"Motivo não informado." }}
-        <br><br>
+{% block breadcrumb %}Oficina / Ordens canceladas{% endblock %}
 
-        <a href="{% url 'detalhe_ordem_servico' ordem.numero %}">
-            Abrir OS
-        </a>
-    </div>
+{% block content %}
 
-    <hr>
+<div class="mb-4">
+    <h2>Ordens de Serviço canceladas</h2>
+    <p class="text-muted mb-0">
+        Consulte as ordens canceladas e seus motivos.
+    </p>
+</div>
 
-{% empty %}
-    <p>Nenhuma Ordem de Serviço cancelada.</p>
-{% endfor %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
 
-</body>
-</html>
+        <thead class="table-dark">
+            <tr>
+                <th>Número</th>
+                <th>Cliente</th>
+                <th>Veículo</th>
+                <th>Data de cancelamento</th>
+                <th>Motivo do cancelamento</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for ordem in ordens %}
+            <tr>
+                <td>
+                    <strong>OS nº {{ ordem.numero }}</strong>
+                </td>
+
+                <td>{{ ordem.cliente.nome }}</td>
+
+                <td>
+                    {{ ordem.veiculo.modelo }}
+                    <br>
+                    <small class="text-muted">
+                        {{ ordem.veiculo.placa }}
+                    </small>
+                </td>
+
+                <td>{{ ordem.data_atualizacao|date:"d/m/Y H:i" }}</td>
+
+                <td>
+                    {{ ordem.motivo_cancelamento|default:"Motivo não informado." }}
+                </td>
+
+                <td>
+                    <a href="{% url 'detalhe_ordem_servico' ordem.numero %}"
+                       class="btn btn-success btn-sm">
+                        Abrir OS
+                    </a>
+                </td>
+            </tr>
+
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center text-muted py-4">
+                    Nenhuma Ordem de Serviço cancelada.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+{% endblock %}
