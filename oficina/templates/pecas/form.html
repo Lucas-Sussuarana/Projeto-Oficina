@@ -1,102 +1,158 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>
-        {% if peca %}
-            Editar Peça
-        {% else %}
-            Cadastro de Peça
-        {% endif %}
-    </title>
-</head>
-<body>
+```html
+{% extends "base.html" %}
 
-{% if peca %}
-    <h1>Editar Peça</h1>
-{% else %}
-    <h1>Nova Peça</h1>
-{% endif %}
+{% block title %}
+    {% if peca %}Editar Peça{% else %}Nova Peça{% endif %} | TESI Oficina
+{% endblock %}
 
-<form method="post">
-    {% csrf_token %}
+{% block breadcrumb %}Cadastros / Peças / {% if peca %}Editar{% else %}Nova peça{% endif %}{% endblock %}
 
-    <p>
-        <label for="nome">Nome:</label><br>
-        <input
-            type="text"
-            name="nome"
-            id="nome"
-            value="{{ peca.nome|default:'' }}"
-            required
-        >
-    </p>
+{% block content %}
 
-    <p>
-        <label for="descricao">Descrição:</label><br>
-        <textarea
-            name="descricao"
-            id="descricao"
-            rows="4"
-        >{{ peca.descricao|default:'' }}</textarea>
-    </p>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-9 col-xl-8">
 
-    <p>
-        <label for="preco">Preço:</label><br>
-        <input
-            type="number"
-            name="preco"
-            id="preco"
-            min="0"
-            step="0.01"
-            value="{{ peca.preco|default:'' }}"
-            required
-        >
-    </p>
+            <div class="mb-4">
+                {% if peca %}
+                    <h2 class="mb-1">Editar peça</h2>
+                    <p class="text-muted mb-0">
+                        Atualize os dados e as configurações desta peça.
+                    </p>
+                {% else %}
+                    <h2 class="mb-1">Cadastrar nova peça</h2>
+                    <p class="text-muted mb-0">
+                        Informe os dados da peça para adicioná-la ao catálogo.
+                    </p>
+                {% endif %}
+            </div>
 
-    <p>
-        <label for="estoque_minimo">Estoque mínimo:</label><br>
-        <input
-            type="number"
-            name="estoque_minimo"
-            id="estoque_minimo"
-            min="0"
-            step="0.01"
-            value="{{ peca.estoque_minimo|default:'0' }}"
-            required
-        >
-    </p>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
 
-    {% if peca %}
-        <p>
-            Estoque atual: {{ peca.estoque }}
-        </p>
+                    <form method="post">
+                        {% csrf_token %}
 
-        <p>
-            <label>
-                <input
-                    type="checkbox"
-                    name="ativo"
-                    {% if peca.ativo %}checked{% endif %}
-                >
-                Peça ativa
-            </label>
-        </p>
-    {% endif %}
+                        <div class="mb-3">
+                            <label for="nome" class="form-label fw-semibold">
+                                Nome da peça
+                            </label>
+                            <input
+                                type="text"
+                                name="nome"
+                                id="nome"
+                                class="form-control"
+                                value="{{ peca.nome|default:'' }}"
+                                required
+                            >
+                        </div>
 
-    <button type="submit">
-        {% if peca %}
-            Salvar alterações
-        {% else %}
-            Salvar peça
-        {% endif %}
-    </button>
-</form>
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label fw-semibold">
+                                Descrição
+                            </label>
+                            <textarea
+                                name="descricao"
+                                id="descricao"
+                                class="form-control"
+                                rows="4"
+                            >{{ peca.descricao|default:'' }}</textarea>
+                            <div class="form-text">
+                                Descreva as características da peça, se necessário.
+                            </div>
+                        </div>
 
-<br>
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label for="preco" class="form-label fw-semibold">
+                                    Preço (R$)
+                                </label>
+                                <input
+                                    type="number"
+                                    name="preco"
+                                    id="preco"
+                                    class="form-control"
+                                    min="0"
+                                    step="0.01"
+                                    value="{{ peca.preco|default:'' }}"
+                                    required
+                                >
+                            </div>
 
-<a href="{% url 'lista_pecas' %}">
-    Voltar para peças
-</a>
+                            <div class="col-12 col-md-6">
+                                <label for="estoque_minimo" class="form-label fw-semibold">
+                                    Estoque mínimo
+                                </label>
+                                <input
+                                    type="number"
+                                    name="estoque_minimo"
+                                    id="estoque_minimo"
+                                    class="form-control"
+                                    min="0"
+                                    step="0.01"
+                                    value="{{ peca.estoque_minimo|default:'0' }}"
+                                    required
+                                >
+                                <div class="form-text">
+                                    Quantidade mínima desejada no estoque.
+                                </div>
+                            </div>
+                        </div>
 
-</body>
-</html>
+                        {% if peca %}
+                            <hr class="my-4">
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    Estoque atual
+                                </label>
+                                <div class="form-control bg-light">
+                                    {{ peca.estoque }}
+                                </div>
+                                <div class="form-text">
+                                    Para alterar a quantidade disponível, utilize a entrada de estoque.
+                                </div>
+                            </div>
+
+                            <div class="form-check form-switch mb-3">
+                                <input
+                                    type="checkbox"
+                                    name="ativo"
+                                    id="ativo"
+                                    class="form-check-input"
+                                    {% if peca.ativo %}checked{% endif %}
+                                >
+                                <label for="ativo" class="form-check-label fw-semibold">
+                                    Peça ativa
+                                </label>
+                            </div>
+                        {% endif %}
+
+                        <hr class="my-4">
+
+                        <div class="d-flex flex-column flex-sm-row justify-content-end gap-2">
+                            <a href="{% url 'lista_pecas' %}"
+                               class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+
+                            <button type="submit" class="btn btn-success px-4">
+                                {% if peca %}
+                                    Salvar alterações
+                                {% else %}
+                                    Salvar peça
+                                {% endif %}
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+```
