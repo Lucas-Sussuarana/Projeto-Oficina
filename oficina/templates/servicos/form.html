@@ -1,85 +1,135 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>
-        {% if servico %}
-            Editar Serviço
-        {% else %}
-            Cadastro de Serviço
-        {% endif %}
-    </title>
-</head>
-<body>
+{% extends "base.html" %}
 
-{% if servico %}
-    <h1>Editar Serviço</h1>
-{% else %}
-    <h1>Novo Serviço</h1>
-{% endif %}
+{% block title %}
+    {% if servico %}Editar Serviço{% else %}Novo Serviço{% endif %} | TESI Oficina
+{% endblock %}
 
-<form method="post">
-    {% csrf_token %}
+{% block breadcrumb %}Cadastros / Serviços / {% if servico %}Editar{% else %}Novo serviço{% endif %}{% endblock %}
 
-    <p>
-        <label for="nome">Nome:</label><br>
-        <input
-            type="text"
-            name="nome"
-            id="nome"
-            value="{{ servico.nome|default:'' }}"
-            required
-        >
-    </p>
+{% block content %}
 
-    <p>
-        <label for="descricao">Descrição:</label><br>
-        <textarea
-            name="descricao"
-            id="descricao"
-            rows="4"
-        >{{ servico.descricao|default:'' }}</textarea>
-    </p>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-9 col-xl-8">
 
-    <p>
-        <label for="preco">Preço:</label><br>
-        <input
-            type="number"
-            name="preco"
-            id="preco"
-            min="0"
-            step="0.01"
-            value="{{ servico.preco|default:'' }}"
-            required
-        >
-    </p>
+            <div class="mb-4">
+                {% if servico %}
+                    <h2 class="mb-1">Editar serviço</h2>
+                    <p class="text-muted mb-0">
+                        Atualize as informações e o preço deste serviço.
+                    </p>
+                {% else %}
+                    <h2 class="mb-1">Cadastrar novo serviço</h2>
+                    <p class="text-muted mb-0">
+                        Cadastre um serviço oferecido pela oficina.
+                    </p>
+                {% endif %}
+            </div>
 
-    {% if servico %}
-        <p>
-            <label>
-                <input
-                    type="checkbox"
-                    name="ativo"
-                    {% if servico.ativo %}checked{% endif %}
-                >
-                Serviço ativo
-            </label>
-        </p>
-    {% endif %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
 
-    <button type="submit">
-        {% if servico %}
-            Salvar alterações
-        {% else %}
-            Salvar serviço
-        {% endif %}
-    </button>
-</form>
+                    <form method="post">
+                        {% csrf_token %}
 
-<br>
+                        <div class="mb-3">
+                            <label for="nome" class="form-label fw-semibold">
+                                Nome do serviço
+                            </label>
 
-<a href="{% url 'lista_servicos' %}">
-    Voltar para serviços
-</a>
+                            <input
+                                type="text"
+                                name="nome"
+                                id="nome"
+                                class="form-control"
+                                value="{{ servico.nome|default:'' }}"
+                                placeholder="Ex.: Alinhamento, lavagem, cambagem"
+                                required
+                            >
+                        </div>
 
-</body>
-</html>
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label fw-semibold">
+                                Descrição
+                            </label>
+
+                            <textarea
+                                name="descricao"
+                                id="descricao"
+                                class="form-control"
+                                rows="4"
+                                placeholder="Descreva o serviço oferecido"
+                            >{{ servico.descricao|default:'' }}</textarea>
+
+                            <div class="form-text">
+                                Campo opcional para detalhar o serviço.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="preco" class="form-label fw-semibold">
+                                Preço (R$)
+                            </label>
+
+                            <input
+                                type="number"
+                                name="preco"
+                                id="preco"
+                                class="form-control"
+                                min="0"
+                                step="0.01"
+                                value="{{ servico.preco|default:'' }}"
+                                placeholder="0,00"
+                                required
+                            >
+                        </div>
+
+                        {% if servico %}
+                            <hr class="my-4">
+
+                            <div class="form-check form-switch mb-3">
+                                <input
+                                    type="checkbox"
+                                    name="ativo"
+                                    id="ativo"
+                                    class="form-check-input"
+                                    {% if servico.ativo %}checked{% endif %}
+                                >
+
+                                <label for="ativo" class="form-check-label fw-semibold">
+                                    Serviço ativo
+                                </label>
+
+                                <div class="form-text">
+                                    Serviços inativos podem ser mantidos no cadastro sem serem oferecidos normalmente.
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <hr class="my-4">
+
+                        <div class="d-flex flex-column flex-sm-row justify-content-end gap-2">
+                            <a href="{% url 'lista_servicos' %}"
+                               class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+
+                            <button type="submit" class="btn btn-success px-4">
+                                {% if servico %}
+                                    Salvar alterações
+                                {% else %}
+                                    Salvar serviço
+                                {% endif %}
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
