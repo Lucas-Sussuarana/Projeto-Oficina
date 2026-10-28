@@ -1,56 +1,108 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Entrada de Estoque</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h1>Entrada de Estoque</h1>
+{% block title %}Entrada de Estoque | TESI Oficina{% endblock %}
 
-<p>
-    Peça:
-    <strong>{{ peca.nome }}</strong>
-</p>
+{% block breadcrumb %}Cadastros / Peças / Entrada de estoque{% endblock %}
 
-<p>
-    Estoque atual:
-    <strong>{{ peca.estoque }}</strong>
-</p>
+{% block content %}
 
-<form method="post">
-    {% csrf_token %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-9 col-xl-8">
 
-    <p>
-        <label for="quantidade">Quantidade de entrada:</label><br>
-        <input
-            type="number"
-            name="quantidade"
-            id="quantidade"
-            min="0.01"
-            step="0.01"
-            required
-        >
-    </p>
+            <div class="mb-4">
+                <h2 class="mb-1">Entrada de estoque</h2>
+                <p class="text-muted mb-0">
+                    Registre a reposição de uma peça no estoque da oficina.
+                </p>
+            </div>
 
-    <p>
-        <label for="observacao">Observação:</label><br>
-        <textarea
-            name="observacao"
-            id="observacao"
-            rows="4"
-        ></textarea>
-    </p>
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
 
-    <button type="submit">
-        Registrar entrada
-    </button>
-</form>
+                        <div>
+                            <span class="text-muted small">Peça selecionada</span>
+                            <h4 class="mb-0 mt-1">{{ peca.nome }}</h4>
+                        </div>
 
-<br>
+                        <div class="rounded-3 bg-light border px-4 py-3">
+                            <span class="text-muted small d-block">Estoque atual</span>
+                            <strong class="fs-4">{{ peca.estoque }}</strong>
+                            <span class="text-muted small d-block">unidades cadastradas</span>
+                        </div>
 
-<a href="{% url 'lista_pecas' %}">
-    Voltar para peças
-</a>
+                    </div>
+                </div>
+            </div>
 
-</body>
-</html>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+
+                    <h5 class="mb-4">Dados da entrada</h5>
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <label for="quantidade" class="form-label fw-semibold">
+                                Quantidade de entrada
+                            </label>
+
+                            <input
+                                type="number"
+                                name="quantidade"
+                                id="quantidade"
+                                class="form-control form-control-lg"
+                                min="0.01"
+                                step="0.01"
+                                placeholder="Informe a quantidade"
+                                required
+                            >
+
+                            <div class="form-text">
+                                Informe a quantidade que será adicionada ao estoque.
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="observacao" class="form-label fw-semibold">
+                                Observação
+                            </label>
+
+                            <textarea
+                                name="observacao"
+                                id="observacao"
+                                class="form-control"
+                                rows="4"
+                                placeholder="Ex.: reposição de fornecedor, nota fiscal ou motivo da entrada"
+                            ></textarea>
+
+                            <div class="form-text">
+                                Campo opcional para registrar detalhes da reposição.
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex flex-column flex-sm-row justify-content-end gap-2">
+                            <a href="{% url 'lista_pecas' %}"
+                               class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+
+                            <button type="submit" class="btn btn-success px-4">
+                                Registrar entrada
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
