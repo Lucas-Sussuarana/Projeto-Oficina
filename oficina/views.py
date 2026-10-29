@@ -172,11 +172,11 @@ def editar_veiculo(request, id):
 )
 
 def excluir_veiculo(request, id):
-
     veiculo = get_object_or_404(Veiculo, id=id)
 
     if request.method == 'POST':
-        veiculo.delete()
+        veiculo.ativo = False
+        veiculo.save(update_fields=['ativo'])
         return redirect('lista_clientes')
 
     return render(
@@ -184,6 +184,7 @@ def excluir_veiculo(request, id):
         'veiculos/excluir.html',
         {'veiculo': veiculo}
     )
+
 
 # ========================
 # SERVIÇOS

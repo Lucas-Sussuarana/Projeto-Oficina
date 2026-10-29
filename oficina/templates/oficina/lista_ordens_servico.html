@@ -6,11 +6,17 @@
 
 {% block content %}
 
-<div class="mb-4">
-    <h2>Ordens de Serviço</h2>
-    <p class="text-muted mb-0">
-        Ordens abertas e em atendimento na oficina.
-    </p>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2>Ordens de Serviço</h2>
+        <p class="text-muted mb-0">
+            Ordens abertas e em atendimento na oficina.
+        </p>
+    </div>
+
+    <a href="{% url 'abrir_ordem_servico' %}" class="btn btn-success">
+        + Criar O.S.
+    </a>
 </div>
 
 <div class="table-responsive">
