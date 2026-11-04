@@ -1,7 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Cliente, Veiculo, Servico, Peca, ItemServico, ItemPeca, Observacao, OrdemServico,  MovimentacaoEstoque,  ParticipacaoMecanico
+from .models import Cliente, Veiculo, Servico, Peca, ItemServico, ItemPeca, Observacao, OrdemServico,  MovimentacaoEstoque,  ParticipacaoMecanico,  NotaServico
 from .forms import ClienteForm, VeiculoForm, OrdemServicoForm
+from django.contrib import messages
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.utils import timezone
+
 
 
 @login_required
@@ -938,6 +943,7 @@ def entregar_ordem_servico(request, numero):
         'detalhe_ordem_servico',
         numero=ordem.numero
     )
+
 @login_required
 @user_passes_test(
     lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
@@ -995,4 +1001,79 @@ def cancelar_ordem_servico(request, numero):
     return redirect(
         'detalhe_ordem_servico',
         numero=ordem.numero
+    )
+
+@login_required
+@user_passes_test(
+    lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
+)
+
+def gerar_nota_servico(request, numero):
+
+    ordem = get_object_or_404(
+        OrdemServico,
+        numero=numero,
+        status='ENTREGUE'
+    )
+
+    # Verifica se a nota já foi emitida
+    if hasattr(ordem, 'nota_servico'):
+        messages.info(
+            request,
+            'Esta OS já possui uma Nota de Serviço emitida.'
+        )
+        return redirect(
+            'visualizar_nota_servico',
+            numero=ordem.numero
+        )
+
+    if request.method == 'POST':
+
+        NotaServico.objects.create(
+            ordem_servico=ordem,
+            emitida_por=request.user,
+            valor_total=ordem.valor_total,
+            observacao=ordem.observacao_final
+        )
+
+        messages.success(
+            request,
+            'Nota de Serviço emitida com sucesso.'
+        )
+
+        return redirect(
+            'visualizar_nota_servico',
+            numero=ordem.numero
+        )
+
+    return redirect(
+        'detalhe_ordem_servico',
+        numero=ordem.numero
+    )
+
+@login_required
+@user_passes_test(
+    lambda user: user.is_superuser or user.groups.filter(name='Recepcionistas').exists()
+)
+
+def visualizar_nota_servico(request, numero):
+
+    ordem = get_object_or_404(
+        OrdemServico,
+        numero=numero,
+        status='ENTREGUE'
+    )
+
+    nota = get_object_or_404(
+        NotaServico,
+        ordem_servico=ordem
+    )
+
+    return render(
+        request,
+        'ordens/nota_servico.html',
+        {
+            'ordem': ordem,
+            'nota': nota,
+        }
     )

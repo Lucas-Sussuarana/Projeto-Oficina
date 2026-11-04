@@ -177,4 +177,16 @@ urlpatterns = [
         name='cancelar_ordem_servico'
     ),
 
+    path(
+        'ordens/<int:numero>/nota-servico/gerar/',
+        views.gerar_nota_servico,
+        name='gerar_nota_servico'
+    ),
+
+    path(
+        'ordens/<int:numero>/nota-servico/',
+        views.visualizar_nota_servico,
+        name='visualizar_nota_servico'
+    ),
+
 ]

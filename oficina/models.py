@@ -215,12 +215,6 @@ class OrdemServico(models.Model):
         default='ABERTA'
     )
 
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='ABERTA'
-    )
-
     observacao_final = models.TextField(
         blank=True,
         null=True
@@ -486,6 +480,58 @@ class ItemPeca(models.Model):
 
     def __str__(self):
         return f"{self.peca.nome} - OS #{self.ordem_servico.id}"
+
+# ========================
+# NOTA DE SERVIÇO PARA CLIENTE
+# ========================
+
+class NotaServico(models.Model):
+
+    numero = models.PositiveIntegerField(
+        unique=True,
+        editable=False
+    )
+
+    ordem_servico = models.OneToOneField(
+        OrdemServico,
+        on_delete=models.PROTECT,
+        related_name='nota_servico'
+    )
+
+    data_emissao = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    emitida_por = models.ForeignKey(
+        'auth.User',
+        on_delete=models.PROTECT,
+        related_name='notas_servico_emitidas'
+    )
+
+    valor_total = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    observacao = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.numero:
+            ultima = NotaServico.objects.order_by('-numero').first()
+
+            if ultima:
+                self.numero = ultima.numero + 1
+            else:
+                self.numero = 1
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Nota de Serviço #{self.numero} - OS #{self.ordem_servico.numero}"
+
 
 # ========================
 # PARTICIPAÇÃO DO MECÂNICO
