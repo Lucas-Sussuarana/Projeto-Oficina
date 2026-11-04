@@ -1,19 +1,143 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-    <title>Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login | TESI Oficina</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            min-height: 100vh;
+            background: #173d32;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-title {
+            color: #173d32;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .login-subtitle {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .form-control {
+            padding: 11px 12px;
+            border-radius: 7px;
+        }
+
+        .form-control:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+        }
+
+        .btn-login {
+            background: #198754;
+            color: white;
+            padding: 11px;
+            border-radius: 7px;
+            font-weight: 600;
+        }
+
+        .btn-login:hover {
+            background: #146c43;
+            color: white;
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 30px 24px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>Login</h1>
+    <div class="login-card">
 
-<form method="post">
-    {% csrf_token %}
+        <div class="text-center mb-4">
+            <h2 class="login-title">TESI Oficina</h2>
+            <p class="login-subtitle">
+                Sistema de gerenciamento de oficina
+            </p>
+        </div>
 
-    {{ form.as_p }}
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                Usuário ou senha incorretos. Verifique suas credenciais.
+            </div>
+        {% endif %}
 
-    <button type="submit">Entrar</button>
-</form>
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="{{ form.username.id_for_label }}"
+                       class="form-label fw-semibold">
+                    Usuário
+                </label>
+
+                <input
+                    type="text"
+                    name="username"
+                    id="id_username"
+                    class="form-control"
+                    placeholder="Digite seu usuário"
+                    autocomplete="username"
+                    required
+                    autofocus
+                >
+            </div>
+
+            <div class="mb-4">
+                <label for="{{ form.password.id_for_label }}"
+                       class="form-label fw-semibold">
+                    Senha
+                </label>
+
+                <input
+                    type="password"
+                    name="password"
+                    id="id_password"
+                    class="form-control"
+                    placeholder="Digite sua senha"
+                    autocomplete="current-password"
+                    required
+                >
+            </div>
+
+            <input type="hidden" name="next" value="{{ next }}">
+
+            <button type="submit" class="btn btn-login w-100">
+                Entrar no sistema
+            </button>
+        </form>
+
+        <div class="text-center mt-4">
+            <small class="text-muted">
+                TESI Oficina
+            </small>
+        </div>
+
+    </div>
 
 </body>
 </html>
