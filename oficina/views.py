@@ -1071,7 +1071,7 @@ def visualizar_nota_servico(request, numero):
 
     return render(
         request,
-        'ordens/nota_servico.html',
+        'oficina/nota_servico.html',
         {
             'ordem': ordem,
             'nota': nota,

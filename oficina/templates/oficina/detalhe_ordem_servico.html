@@ -471,6 +471,55 @@
 </div>
 {% endif %}
 
+<!-- NOTA DE SERVIÇO -->
+{% if ordem.status == 'ENTREGUE' %}
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header bg-success text-white">
+        <strong>Nota de Serviço</strong>
+    </div>
+
+    <div class="card-body">
+
+        {% if ordem.nota_servico %}
+
+            <p>
+                A Nota de Serviço nº
+                <strong>{{ ordem.nota_servico.numero }}</strong>
+                já foi emitida para esta OS.
+            </p>
+
+            <a href="{% url 'visualizar_nota_servico' ordem.numero %}"
+               class="btn btn-success">
+                Visualizar / Imprimir Nota
+            </a>
+
+        {% else %}
+
+            <p>
+                O veículo foi entregue. Você pode emitir o
+                comprovante de serviços e peças para o cliente.
+            </p>
+
+            <form method="post"
+                  action="{% url 'gerar_nota_servico' ordem.numero %}">
+                {% csrf_token %}
+
+                <button type="submit" class="btn btn-success">
+                    Gerar Nota de Serviço
+                </button>
+            </form>
+
+        {% endif %}
+
+        <small class="text-muted d-block mt-3">
+            Documento sem validade fiscal.
+        </small>
+
+    </div>
+</div>
+{% endif %}
+
 <!-- CANCELAR OS -->
 {% if ordem.status == 'ABERTA' or ordem.status == 'EM_ATENDIMENTO' %}
     {% if pode_cancelar %}
